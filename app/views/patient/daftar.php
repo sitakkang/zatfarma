@@ -36,5 +36,6 @@
 <div class="ds-form-group">
     <label>Tanggal &amp; Jam Daftar <span class="text-danger">*</span></label>
     <input type="text" id="trans_doc" name="trans_doc" class="form-control datetimepicker"
+           value="<?= htmlspecialchars($default_trans_doc, ENT_QUOTES, 'UTF-8') ?>"
            placeholder="dd/mm/Y HH:ii" autocomplete="off" readonly>
 </div>

@@ -323,6 +323,7 @@ class Patient extends CI_Controller {
         if (!$data['row']) {
             show_404();
         }
+        $data['default_trans_doc'] = date('d/m/Y H:i');
         $this->load->view($this->dir_v.'daftar', $data);
     }
 
