@@ -336,7 +336,7 @@ class Dokter extends CI_Controller {
 
             $pulv = array(
                 'medical_record_id' => $medical_record_id,
-                'pulv_name'         => strtoupper($pulv_name),
+                'pulv_name'         => $pulv_name,
                 'pulv_notes'        => trim($this->input->post('pulv_notes')),
                 'pulv_dosis'        => $pulv_dosis,
                 'pulv_qty'          => $pulv_qty,
@@ -397,7 +397,7 @@ class Dokter extends CI_Controller {
         }
 
         $data = array(
-            'pulv_name'  => strtoupper($pulv_name),
+            'pulv_name'  => $pulv_name,
             'pulv_notes' => trim($this->input->post('pulv_notes')),
             'pulv_dosis' => $pulv_dosis,
             'pulv_qty'   => $pulv_qty,
@@ -467,20 +467,20 @@ class Dokter extends CI_Controller {
 
         $data = array(
             'visit_id'     => $visit_id,
-            'patient_name' => strtoupper(trim($row->patient_name)),
-            'patient_nik'  => trim($row->patient_nik),
-            'company_name' => strtoupper(trim($row->trans_patient_company)),
-            'patient_job'  => strtoupper(trim($row->patient_job)),
+            'patient_name' => $row->patient_name,
+            'patient_nik'  => $row->patient_nik,
+            'company_name' => $row->trans_patient_company,
+            'patient_job'  => $row->patient_job,
             'age'          => $age,
             'gender'       => $gender,
-            'diagnosa'     => strtoupper(trim($this->input->post('diagnosa'))),
+            'diagnosa'     => $this->input->post('diagnosa'),
             'terapi'       => trim($this->input->post('terapi')),
             'datefrom'     => $this->format_date_db($this->input->post('datefrom')),
             'dateto'       => $this->format_date_db($this->input->post('dateto')),
             'docdate'      => $this->format_date_db($this->input->post('docdate')),
             'docnumb'      => $docnumb,
             'doctby'       => $doct_by,
-            'alamat'         => strtoupper(trim($row->patient_address)),
+            'alamat'        => $row->patient_address,
             
         );
 
@@ -673,14 +673,14 @@ class Dokter extends CI_Controller {
 
         $data = array(
             'visit_id'             => $visit_id,
-            'skbs_patient_name'    => strtoupper(trim($row->patient_name)),
+            'skbs_patient_name'    => $row->patient_name,
             'skbs_patient_nik'     => $row->patient_nik,
-            'skbs_patient_department' => strtoupper(trim($row->trans_patient_department)),
-            'skbs_patient_company' => strtoupper(trim($row->trans_patient_company)),
+            'skbs_patient_department' => $row->trans_patient_department,
+            'skbs_patient_company' => $row->trans_patient_company,
             'skbs_patient_ktp'     => $row->patient_ktp,
             'skbs_patient_age'     => !empty($row->patient_bod) ? date_diff(date_create($row->patient_bod), date_create('now'))->y : '0',
             'skbs_result_id'       => null,
-            'skbs_result_name'     => strtoupper(trim($this->input->post('skbs_result'))),
+            'skbs_result_name'     => $this->input->post('skbs_result'),
             'skbs_desc'            => trim($this->input->post('skbs_desc')),
             'skbs_note'            => trim($this->input->post('skbs_note')),
             'skbs_td'              => trim($this->input->post('skbs_td')),
@@ -818,12 +818,12 @@ class Dokter extends CI_Controller {
 
         $data = array(
             'visit_id'          => $visit_id,
-            'patient_name'      => strtoupper(trim($this->input->post('patient_name'))),
+            'patient_name'      => $this->input->post('patient_name'),
             'nik'               => trim($this->input->post('nik')),
-            'company_name'      => strtoupper(trim($this->input->post('company_name'))),
-            'pengantar'         => strtoupper(trim($this->input->post('pengantar'))),
+            'company_name'      => $this->input->post('company_name'),
+            'pengantar'         => trim($this->input->post('pengantar')),
             'nik_pengantar'     => trim($this->input->post('nik_pengantar')),
-            'company_pengantar' => strtoupper(trim($this->input->post('company_pengantar'))),
+            'company_pengantar' => trim($this->input->post('company_pengantar')),
             'hubungan'          => $this->input->post('hubungan'),
             'tgl_datang'        => $this->format_date_db($this->input->post('tgl_datang')),
             'jam'               => trim($this->input->post('jam')),

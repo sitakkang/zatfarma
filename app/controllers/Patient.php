@@ -173,7 +173,7 @@ class Patient extends CI_Controller {
         $insert_by = $this->session->userdata('sess_id');
         $data = array(
             'visit_id'                => null,
-            'skbs_patient_name'       => strtoupper(trim($patient->patient_name)),
+            'skbs_patient_name'       => $patient->patient_name,
             'skbs_patient_nik'        => $patient->patient_nik,
             'skbs_patient_department' => $patient->patient_department,
             'skbs_patient_company'    => $patient->patient_company,
@@ -238,15 +238,15 @@ class Patient extends CI_Controller {
 
         $data = array(
             'patient_code'        => $this->M_patient->generate_patient_code(),
-            'patient_name'        => strtoupper(trim($this->input->post('patient_name'))),
+            'patient_name'        => $this->input->post('patient_name'),
             'patient_nik'         => $nik,
-            'patient_company'     => strtoupper(trim($this->input->post('patient_company'))),
-            'patient_job'         => strtoupper(trim($this->input->post('patient_job'))),
+            'patient_company'     => $this->input->post('patient_company'),
+            'patient_job'         => $this->input->post('patient_job'),
             'patient_ktp'         => $ktp,
             'patient_gender'      => $this->input->post('patient_gender'),
             'patient_bod'         => $this->format_date_db($this->input->post('patient_bod')),
-            'patient_address'     => strtoupper(trim($this->input->post('patient_address'))),
-            'patient_phone'       => trim($this->input->post('patient_phone')),
+            'patient_address'     => $this->input->post('patient_address'),
+            'patient_phone'       => $this->input->post('patient_phone'),
             'patient_status'      => 1,
             'insert_by'            => $this->session->userdata('sess_id'),
             'insert_dt'            => date('Y-m-d H:i:s'),
@@ -269,14 +269,14 @@ class Patient extends CI_Controller {
         $id = intval($this->input->post('id'));
 
         $data = array(
-            'patient_name'        => strtoupper(trim($this->input->post('patient_name'))),
+            'patient_name'        => $this->input->post('patient_name'),
             'patient_nik'         => trim($this->input->post('patient_nik')),
-            'patient_company'     => strtoupper(trim($this->input->post('patient_company'))),
-            'patient_job'         => strtoupper(trim($this->input->post('patient_job'))),
+            'patient_company'     => $this->input->post('patient_company'),
+            'patient_job'         => $this->input->post('patient_job'),
             'patient_ktp'         => trim($this->input->post('patient_ktp')),
             'patient_gender'      => $this->input->post('patient_gender'),
             'patient_bod'         => $this->format_date_db($this->input->post('patient_bod')),
-            'patient_address'     => strtoupper(trim($this->input->post('patient_address'))),
+            'patient_address'     => trim($this->input->post('patient_address')),
             'patient_phone'       => trim($this->input->post('patient_phone')),
             'updateby'            => $this->session->userdata('sess_id'),
             'updatedt'            => date('Y-m-d H:i:s'),

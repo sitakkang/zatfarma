@@ -93,8 +93,8 @@ class Obat extends CI_Controller {
 
     public function act_add() {
         $data = array(
-            'obat_name'   => strtoupper(trim($this->input->post('obat_name'))),
-            'obat_satuan' => strtoupper(trim($this->input->post('obat_satuan'))),
+            'obat_name'   => trim($this->input->post('obat_name')),
+            'obat_satuan' => trim($this->input->post('obat_satuan')),
             'obat_price'  => str_replace(array(',', '.'), '', trim($this->input->post('obat_price'))),
             'obat_status' => 1,
         );
@@ -111,8 +111,8 @@ class Obat extends CI_Controller {
         $id = intval($this->input->post('id'));
 
         $data = array(
-            'obat_name'   => strtoupper(trim($this->input->post('obat_name'))),
-            'obat_satuan' => strtoupper(trim($this->input->post('obat_satuan'))),
+            'obat_name'   => trim($this->input->post('obat_name')),
+            'obat_satuan' => trim($this->input->post('obat_satuan')),
             'obat_price'  => str_replace(array(',', '.'), '', trim($this->input->post('obat_price'))),
         );
 
