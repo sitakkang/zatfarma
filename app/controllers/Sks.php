@@ -177,20 +177,20 @@ class Sks extends CI_Controller {
         }
 
         $data = array(
-            'patient_name' => strtoupper(trim($this->input->post('patient_name'))),
+            'patient_name' => trim($this->input->post('patient_name')),
             'patient_nik'  => $patient ? trim($patient->patient_nik) : '',
-            'company_name' => strtoupper(trim($this->input->post('company_name'))),
+            'company_name' => trim($this->input->post('company_name')),
             'patient_job'  => $patient_job ?: 'KARYAWAN',
             'age'          => trim($this->input->post('age')),
             'gender'       => $this->input->post('gender'),
             'alamat'       => trim($this->input->post('alamat')),
-            'diagnosa'     => strtoupper(trim($this->input->post('diagnosa'))),
+            'diagnosa'     => trim($this->input->post('diagnosa')),
             'terapi'       => trim($this->input->post('terapi')),
             'docnumb'      => $docnumb,
             'datefrom'     => $this->format_date_db($this->input->post('datefrom')),
             'dateto'       => $this->format_date_db($this->input->post('dateto')),
             'docdate'      => $this->format_date_db($this->input->post('docdate')),
-            'doctby'       => strtoupper(trim($this->input->post('doctby'))),
+            'doctby'       => trim($this->input->post('doctby')),
             'insertby'     => $this->session->userdata('sess_id'),
             'insertdt'     => date('Y-m-d H:i:s'),
         );
@@ -233,19 +233,19 @@ class Sks extends CI_Controller {
         $patient_job = $this->M_sks->get_patient_job_by_name($this->input->post('patient_name'));
 
         $data = array(
-            'patient_name' => strtoupper(trim($this->input->post('patient_name'))),
-            'company_name' => strtoupper(trim($this->input->post('company_name'))),
+            'patient_name' => trim($this->input->post('patient_name')),
+            'company_name' => trim($this->input->post('company_name')),
             'patient_job'  => $patient_job ?: 'KARYAWAN',
             'age'          => trim($this->input->post('age')),
             'gender'       => $this->input->post('gender'),
             'alamat'       => trim($this->input->post('alamat')),
-            'diagnosa'     => strtoupper(trim($this->input->post('diagnosa'))),
+            'diagnosa'     => trim($this->input->post('diagnosa')),
             'terapi'       => trim($this->input->post('terapi')),
             'docnumb'      => $docnumb,
             'datefrom'     => $this->format_date_db($this->input->post('datefrom')),
             'dateto'       => $this->format_date_db($this->input->post('dateto')),
             'docdate'      => $this->format_date_db($this->input->post('docdate')),
-            'doctby'       => strtoupper(trim($this->input->post('doctby'))),
+            'doctby'       => trim($this->input->post('doctby')),
             'updateby'     => $this->session->userdata('sess_id'),
             'updatedt'     => date('Y-m-d H:i:s'),
         );

@@ -139,6 +139,22 @@
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
+
+                    <?php if (!empty($visit->sks)): ?>
+                        <div class="history-cell-block">
+                            <div class="history-cell-title">Surat Keterangan Sakit (SKS)</div>
+                            <?php foreach ($visit->sks as $sks): ?>
+                                <div>
+                                    <strong>No. SKS:</strong>
+                                    <?= htmlspecialchars($sks->docnumb ?: '-', ENT_QUOTES, 'UTF-8') ?><br>
+                                    <strong>Istirahat:</strong>
+                                    <?= !empty($sks->datefrom) && strtotime($sks->datefrom) !== false ? date('d/m/Y', strtotime($sks->datefrom)) : '-' ?>
+                                    &ndash;
+                                    <?= !empty($sks->dateto) && strtotime($sks->dateto) !== false ? date('d/m/Y', strtotime($sks->dateto)) : '-' ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </td>
                 <td><?= htmlspecialchars($visit->doctor_name ?: '-', ENT_QUOTES, 'UTF-8') ?></td>
             </tr>
