@@ -51,8 +51,8 @@ $visit_date = !empty($row->trans_doc) ? date('d/m/Y', strtotime($row->trans_doc)
     </div>
     <main class="sheet">
         <header class="header">
-            <img src="<?= base_url('img/zaffarma-login-logo.jpg') ?>" alt="Zatfarma">
-            <h1>APOTEK ZATFARMA</h1>
+            <img src="<?= base_url('img/zaffarma-login-logo.jpg') ?>" alt="Zaffarma">
+            <h1>APOTEK ZAF FARMA</h1>
         </header>
 
         <div class="title">RESEP</div>
