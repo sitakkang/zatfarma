@@ -131,6 +131,8 @@ class Dokter extends CI_Controller {
         $data['sks_list'] = $data['sks'] ? array($data['sks']) : array();
         $data['skbs'] = $this->M_dokter->get_skbs_by_visit_id($visit_id);
         $data['skmb'] = $this->M_dokter->get_skmb_by_visit_id($visit_id);
+        $data['default_skbs_docnumb'] = $this->generate_docnumb_skbs();
+        $data['default_skmb_docnumb'] = $this->generate_docnumb_skmb();
         $data['dokter_level6'] = $this->M_dokter->get_users_by_level(3);
 
         $data['css'] = array(
@@ -148,7 +150,7 @@ class Dokter extends CI_Controller {
             'lib/mask/jquery.mask.min.js',
             'lib/sweetalert/sweetalert2.all.min.js',
             'src/js/admin/dokter.js',
-            'src/js/admin/pemeriksaandokter.js',
+            'src/js/admin/pemeriksaandokter.js?v=' . filemtime(FCPATH . 'src/js/admin/pemeriksaandokter.js'),
         );
         $data['panel'] = '<i class="fa fa-stethoscope"></i> &nbsp;<b>Pemeriksaan Pasien</b>';
         $this->l_skin->main($this->dir_v.'pemeriksaan', $data);
@@ -442,6 +444,20 @@ class Dokter extends CI_Controller {
         }
 
         $existing = $this->M_dokter->get_sks_by_visit_id($visit_id);
+        $docnumb  = trim((string) $this->input->post('docnumb', TRUE));
+        if ($docnumb === '') {
+            echo json_encode(array('status' => 1, 'notif' => 'Silakan isi nomor SKS!'));
+            return;
+        }
+        if (preg_match('/^0+\s*\//', $docnumb)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Nomor SKS tidak boleh diawali angka 000!'));
+            return;
+        }
+        if (!$this->M_dokter->is_sks_docnumb_unique($docnumb, $existing ? $existing->id : 0)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Nomor SKS sudah digunakan!'));
+            return;
+        }
+
         $now      = date('Y-m-d H:i:s');
         $insertby = $this->session->userdata('sess_id');
         $doct_by  = $row->trans_doct_by;
@@ -452,6 +468,7 @@ class Dokter extends CI_Controller {
         $data = array(
             'visit_id'     => $visit_id,
             'patient_name' => strtoupper(trim($row->patient_name)),
+            'patient_nik'  => trim($row->patient_nik),
             'company_name' => strtoupper(trim($row->trans_patient_company)),
             'patient_job'  => strtoupper(trim($row->patient_job)),
             'age'          => $age,
@@ -461,6 +478,7 @@ class Dokter extends CI_Controller {
             'datefrom'     => $this->format_date_db($this->input->post('datefrom')),
             'dateto'       => $this->format_date_db($this->input->post('dateto')),
             'docdate'      => $this->format_date_db($this->input->post('docdate')),
+            'docnumb'      => $docnumb,
             'doctby'       => $doct_by,
             'alamat'         => strtoupper(trim($row->patient_address)),
             
@@ -470,15 +488,20 @@ class Dokter extends CI_Controller {
             // UPDATE
             $data['updateby'] = $insertby;
             $data['updatedt'] = $now;
-            $this->M_dokter->update_sks($existing->id, $data);
-            $msg = 'SKS berhasil diperbarui! (No. ' . htmlspecialchars($existing->docnumb) . ')';
+            if (!$this->M_dokter->update_sks($existing->id, $data)) {
+                echo json_encode(array('status' => 1, 'notif' => 'SKS gagal diperbarui. Silakan coba kembali!'));
+                return;
+            }
+            $msg = 'SKS berhasil diperbarui! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')';
         } else {
             // INSERT
-            $data['docnumb']  = $this->M_dokter->generate_docnumb_sks();
             $data['insertby'] = $insertby;
             $data['insertdt'] = $now;
-            $this->M_dokter->insert_sks($data);
-            $msg = 'SKS berhasil dibuat! (No. ' . $data['docnumb'] . ')';
+            if (!$this->M_dokter->insert_sks($data)) {
+                echo json_encode(array('status' => 1, 'notif' => 'SKS gagal dibuat. Silakan coba kembali!'));
+                return;
+            }
+            $msg = 'SKS berhasil dibuat! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')';
         }
 
         echo json_encode(array(
@@ -629,6 +652,20 @@ class Dokter extends CI_Controller {
         }
 
         $existing = $this->M_dokter->get_skbs_by_visit_id($visit_id);
+        $docnumb = trim((string) $this->input->post('skbs_docnumb', TRUE));
+        if ($docnumb === '') {
+            echo json_encode(array('status' => 1, 'notif' => 'Silakan isi nomor SKBS!'));
+            return;
+        }
+        if (preg_match('/^0+\s*\//', $docnumb)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Nomor SKBS tidak boleh diawali angka 000!'));
+            return;
+        }
+        if (!$this->M_dokter->is_skbs_docnumb_unique($docnumb, $existing ? $existing->id_skbs : 0)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Nomor SKBS sudah digunakan!'));
+            return;
+        }
+
         $now = date('Y-m-d H:i:s');
         $insert_by = $row->trans_doct_by;
         $doct_by = $this->M_dokter->get_doct_by($insert_by)->fullname;
@@ -655,6 +692,7 @@ class Dokter extends CI_Controller {
             'skbs_koreksi_r'       => trim($this->input->post('skbs_koreksi_r')),
             'skbs_koreksi_l'       => trim($this->input->post('skbs_koreksi_l')),
             'skbs_doc_date'        => date('Y-m-d'),
+            'skbs_docnumb'         => $docnumb,
             'skbs_doct_id'         => $insert_by,
             'skbs_doct_name'       => $doct_by,
             'skbs_status'          => 1,
@@ -663,13 +701,19 @@ class Dokter extends CI_Controller {
         if ($existing) {
             $data['update_dt'] = $now;
             $data['update_by'] = $insert_by;
-            $this->M_dokter->update_skbs($existing->id_skbs, $data);
-            $msg = 'SKBS berhasil diperbarui!';
+            if (!$this->M_dokter->update_skbs($existing->id_skbs, $data)) {
+                echo json_encode(array('status' => 1, 'notif' => 'SKBS gagal diperbarui. Silakan coba kembali!'));
+                return;
+            }
+            $msg = 'SKBS berhasil diperbarui! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')';
         } else {
             $data['insert_dt'] = $now;
             $data['insert_by'] = $insert_by;
-            $this->M_dokter->insert_skbs($data);
-            $msg = 'SKBS berhasil disimpan!';
+            if (!$this->M_dokter->insert_skbs($data)) {
+                echo json_encode(array('status' => 1, 'notif' => 'SKBS gagal disimpan. Silakan coba kembali!'));
+                return;
+            }
+            $msg = 'SKBS berhasil disimpan! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')';
         }
 
         echo json_encode(array('status' => 2, 'notif' => $msg));
@@ -689,7 +733,9 @@ class Dokter extends CI_Controller {
         // Generate nomor dokumen
         $month_roman = $this->month_roman(date('n'));
         $year = date('Y');
-        $data['docnumb'] = sprintf('%05d', $row->id_skbs) . '/IMIP-SKBS/' . $month_roman . '/' . $year;
+        $data['docnumb'] = !empty($row->skbs_docnumb)
+            ? $row->skbs_docnumb
+            : sprintf('%05d', $row->id_skbs) . '/IMIP-SKBS/' . $month_roman . '/' . $year;
         $data['row'] = $row;
         $data['qrcode'] = $this->generate_qrcode_skbs($id);
 
@@ -717,6 +763,10 @@ class Dokter extends CI_Controller {
         return isset($map[$n]) ? $map[$n] : '';
     }
 
+    private function generate_docnumb_skbs() {
+        return '000/SKBS/ZAF/' . $this->month_roman(date('n')) . '/' . date('Y');
+    }
+
     /**
      * Hapus SKBS
      */
@@ -737,6 +787,7 @@ class Dokter extends CI_Controller {
 
         $data['row'] = $row;
         $data['skbs'] = $this->M_dokter->get_skbs_by_visit_id($visit_id);
+        $data['default_skbs_docnumb'] = $this->generate_docnumb_skbs();
         $data['dokter_list'] = $this->M_dokter->get_all_doctor();
         $this->load->view($this->dir_v.'_skbs_section', $data);
     }
@@ -782,16 +833,49 @@ class Dokter extends CI_Controller {
         );
 
         if ($existing) {
+            $docnumb = trim((string) $this->input->post('skmb_docnumb', TRUE));
+            if ($docnumb === '') {
+                echo json_encode(array('status' => 1, 'notif' => 'Silakan isi nomor SKMB!'));
+                return;
+            }
+            if (preg_match('/^0+\s*\//', $docnumb)) {
+                echo json_encode(array('status' => 1, 'notif' => 'Nomor SKMB tidak boleh diawali angka 000!'));
+                return;
+            }
+            if (!$this->M_dokter->is_skmb_docnumb_unique($docnumb, $existing->id)) {
+                echo json_encode(array('status' => 1, 'notif' => 'Nomor SKMB sudah digunakan!'));
+                return;
+            }
+            $data['docnumb'] = $docnumb;
             $data['updateby'] = $insert_by;
             $data['updatedt'] = $now;
-            $this->M_dokter->update_skmb($existing->id, $data);
-            $msg = 'SKMB berhasil diperbarui!';
+            if (!$this->M_dokter->update_skmb($existing->id, $data)) {
+                echo json_encode(array('status' => 1, 'notif' => 'SKMB gagal diperbarui. Silakan coba kembali!'));
+                return;
+            }
+            $msg = 'SKMB berhasil diperbarui! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')';
         } else {
-            $data['docnumb']  = $this->generate_docnumb_skmb();
+            $docnumb = trim((string) $this->input->post('skmb_docnumb', TRUE));
+            if ($docnumb === '') {
+                echo json_encode(array('status' => 1, 'notif' => 'Silakan isi nomor SKMB!'));
+                return;
+            }
+            if (preg_match('/^0+\s*\//', $docnumb)) {
+                echo json_encode(array('status' => 1, 'notif' => 'Nomor SKMB tidak boleh diawali angka 000!'));
+                return;
+            }
+            if (!$this->M_dokter->is_skmb_docnumb_unique($docnumb)) {
+                echo json_encode(array('status' => 1, 'notif' => 'Nomor SKMB sudah digunakan!'));
+                return;
+            }
+            $data['docnumb'] = $docnumb;
             $data['insertby'] = $insert_by;
             $data['insertdt'] = $now;
-            $this->M_dokter->insert_skmb($data);
-            $msg = 'SKMB berhasil disimpan!';
+            if (!$this->M_dokter->insert_skmb($data)) {
+                echo json_encode(array('status' => 1, 'notif' => 'SKMB gagal disimpan. Silakan coba kembali!'));
+                return;
+            }
+            $msg = 'SKMB berhasil disimpan! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')';
         }
 
         echo json_encode(array('status' => 2, 'notif' => $msg));
@@ -853,6 +937,7 @@ class Dokter extends CI_Controller {
 
         $data['row'] = $row;
         $data['skmb'] = $this->M_dokter->get_skmb_by_visit_id($visit_id);
+        $data['default_skmb_docnumb'] = $this->generate_docnumb_skmb();
         $data['dokter_list'] = $this->M_dokter->get_all_doctor();
         $this->load->view($this->dir_v.'_skmb_section', $data);
     }
@@ -863,21 +948,7 @@ class Dokter extends CI_Controller {
     private function generate_docnumb_skmb() {
         $month_roman = $this->month_roman(date('n'));
         $year = date('Y');
-
-        $last = $this->db->query(
-            "SELECT docnumb FROM skmb
-             WHERE docnumb LIKE '%/SKMB/" . $month_roman . "/$year'
-             ORDER BY id DESC LIMIT 1"
-        )->row();
-
-        if ($last) {
-            $parts = explode('/', $last->docnumb);
-            $next  = intval($parts[0]) + 1;
-        } else {
-            $next = 1;
-        }
-
-        return sprintf('%05d', $next) . '/SKMB/' . $month_roman . '/' . $year;
+        return '000/SKMB/ZAF/' . $month_roman . '/' . $year;
     }
 
     /**

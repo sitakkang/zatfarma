@@ -69,6 +69,8 @@
                             <th width="80" class="text-center">Status</th>
                             <th width="120" class="text-center">Aksi</th>
                             <th width="130" class="text-center">Tambah SKS</th>
+                            <th width="130" class="text-center">Tambah SKBS</th>
+                            <th width="130" class="text-center">Tambah SKMB</th>
                             <th width="80" class="text-center">Daftar</th>
                         </tr>
                     </thead>

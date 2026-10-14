@@ -3,12 +3,21 @@
 <?php
 // Set timezone WITA untuk jam & tanggal default
 $now_tz = new DateTime('now', new DateTimeZone('Asia/Makassar'));
+$skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_docnumb;
 ?>
 
 <p class="text-muted" style="margin-bottom:12px;">
     <i class="fa fa-info-circle"></i>
     Data pasien diantar akan diambil secara otomatis dari data pendaftaran.
 </p>
+
+<div class="ds-form-group">
+    <label>Nomor SKMB <span class="text-danger">*</span></label>
+    <input type="text" id="skmb_docnumb" class="form-control"
+           value="<?= htmlspecialchars($skmbDocnumb, ENT_QUOTES, 'UTF-8') ?>"
+           placeholder="<?= htmlspecialchars($default_skmb_docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           maxlength="100" autocomplete="off">
+</div>
 
 <div class="ds-form-group">
     <label>Nama Pengantar <span class="text-danger">*</span></label>

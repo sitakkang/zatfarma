@@ -91,10 +91,10 @@
         .btn-print:hover { background: #000; }
 
         /* ── CETAK: kunci ke 1 lembar A4 ───────────────── */
-        @page { size: A4 portrait; margin: 10mm 12mm; }
+        @page { size: A4 portrait; margin: 0; }
 
         @media print {
-            body { padding: 0; }
+            body { padding: 10mm 12mm; }
             .no-print { display: none; }
             .section, .ttd-wrap, .footer { page-break-inside: avoid; }
         }
@@ -107,9 +107,9 @@
     <!-- ══════════ KOP SURAT ══════════ -->
     <div class="kop">
         <div class="kop-instansi">PRAKTEK DOKTER UMUM</div>
-        <div class="kop-dokter">dr. Steve Kojongian</div>
+        <div class="kop-dokter">dr. Fitri Afriana</div>
         <div class="kop-alamat">
-            Jl. Trans Sulawesi, Ds. Bahodopi, Kec. Bahodopi, Morowali &nbsp;|&nbsp; Telp. 081342161194
+            Jl. Trans Sulawesi, Desa Labota, Kec. Bahodopi, Kab. Morowali, Sulawesi Tengah &nbsp;|&nbsp; Telp. 085609487216
         </div>
         <hr class="tebal">
         <hr class="tipis">
@@ -197,5 +197,14 @@
     <div class="footer">
         <p>Dokumen ini diterbitkan secara elektronik dan valid tanpa tanda tangan basah.</p>
     </div>
+    <script>
+        var skbsDocumentTitle = document.title;
+        window.addEventListener('beforeprint', function () {
+            document.title = '';
+        });
+        window.addEventListener('afterprint', function () {
+            document.title = skbsDocumentTitle;
+        });
+    </script>
 </body>
 </html>

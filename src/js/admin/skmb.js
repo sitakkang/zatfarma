@@ -131,6 +131,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#save_add_btn', function () {
         var payload = {
+            docnumb:         $('#docnumb').val(),
             patient_name:    $('#patient_name').val(),
             nik:             $('#nik').val(),
             company_name:    $('#company_name').val(),
@@ -143,6 +144,14 @@ $(document).ready(function () {
             docdate:         $('#docdate').val(),
             doctby:          $('#doctby').val(),
         };
+        if (!payload.docnumb || !payload.docnumb.trim()) {
+            notifNo('Silahkan isi nomor SKMB');
+            return false;
+        }
+        if (/^\s*0+\s*\//.test(payload.docnumb)) {
+            notifNo('Nomor SKMB tidak boleh diawali angka 000');
+            return false;
+        }
         if($('#patient_name').val()==''){
 			notifNo("Silahkan isi nama yang diantar");
             return false;
@@ -175,7 +184,10 @@ $(document).ready(function () {
                 notifYesAuto(res.notif);
                 tabel_skmb.ajax.reload(null, false);
             }
-        }, 'json');
+        }, 'json').fail(function (xhr, textStatus, errorThrown) {
+            console.error('Gagal menyimpan SKMB:', textStatus, errorThrown);
+            notifNo('SKMB gagal disimpan karena terjadi kesalahan pada server. Silakan coba kembali.');
+        });
     });
 
     // --- Lihat Detail SKMB ---
@@ -208,6 +220,7 @@ $(document).ready(function () {
     $(document).on('click', '#save_edit_btn', function () {
         var payload = {
             id:               $('#edit_id').val(),
+            docnumb:          $('#edit_docnumb').val(),
             patient_name:     $('#edit_patient_name').val(),
             nik:              $('#edit_nik').val(),
             company_name:     $('#edit_company_name').val(),
@@ -220,6 +233,14 @@ $(document).ready(function () {
             docdate:          $('#edit_docdate').val(),
             doctby:           $('#edit_doctby').val(),
         };
+        if (!payload.docnumb || !payload.docnumb.trim()) {
+            notifNo('Silahkan isi nomor SKMB');
+            return false;
+        }
+        if (/^\s*0+\s*\//.test(payload.docnumb)) {
+            notifNo('Nomor SKMB tidak boleh diawali angka 000');
+            return false;
+        }
         if($('#edit_patient_name').val()==''){
 			notifNo("Silahkan isi nama yang diantar");
             return false;
@@ -252,7 +273,10 @@ $(document).ready(function () {
                 notifYesAuto(res.notif);
                 tabel_skmb.ajax.reload(null, false);
             }
-        }, 'json');
+        }, 'json').fail(function (xhr, textStatus, errorThrown) {
+            console.error('Gagal memperbarui SKMB:', textStatus, errorThrown);
+            notifNo('SKMB gagal diperbarui karena terjadi kesalahan pada server. Silakan coba kembali.');
+        });
     });
 
     // --- Hapus SKMB ---

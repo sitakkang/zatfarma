@@ -9,6 +9,17 @@ if (isset($patient) && !empty($patient->patient_bod)) {
     $pf_age = date_diff(date_create($patient->patient_bod), date_create('now'))->y;
 }
 ?>
+<?php if (isset($patient)): ?>
+    <input type="hidden" id="patient_id" name="patient_id" value="<?= intval($patient->id_patient) ?>">
+<?php endif; ?>
+<div class="ds-form-group">
+    <label>Nomor SKS <span class="text-danger">*</span></label>
+    <input type="text" id="docnumb" name="docnumb" class="form-control"
+           value="<?= htmlspecialchars($default_docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           placeholder="<?= htmlspecialchars($default_docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           maxlength="100" autocomplete="off">
+</div>
+
 <div class="ds-form-group">
     <label>Nama Pasien <span class="text-danger">*</span></label>
     <input type="text" id="patient_name" name="patient_name" class="form-control"

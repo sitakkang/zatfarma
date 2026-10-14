@@ -10,6 +10,7 @@ class Patient extends CI_Controller {
         $this->m_auth->check_login();
         $this->m_auth->check_akses();
         $this->load->model('M_patient');
+        $this->load->model('M_dokter');
     }
 
     public function index() {
@@ -27,7 +28,7 @@ class Patient extends CI_Controller {
             'lib/datepicker/datepicker.min.js',
             'lib/select/chosen.jquery.min.js',
             'lib/mask/jquery.mask.min.js',
-            'src/js/admin/patient.js',
+            'src/js/admin/patient.js?v=' . filemtime(FCPATH . 'src/js/admin/patient.js'),
         );
         $data['panel'] = '<i class="fa fa-user-injured"></i> &nbsp;<b>Manajemen Pendaftaran</b>';
         $this->l_skin->main($this->dir_v.'view', $data);
@@ -120,6 +121,94 @@ class Patient extends CI_Controller {
             show_404();
         }
         $this->load->view($this->dir_v.'detail', $data);
+    }
+
+    public function add_skbs_from_patient($id) {
+        $patient = $this->M_patient->get_by_id(intval($id));
+        if (!$patient) {
+            show_404();
+        }
+
+        $data['patient'] = $patient;
+        $data['dokter_list'] = $this->M_dokter->get_all_doctor();
+        $data['default_skbs_docnumb'] = '000/SKBS/ZAF/' . $this->month_roman(date('n')) . '/' . date('Y');
+        $this->load->view($this->dir_v.'add_skbs', $data);
+    }
+
+    public function act_add_skbs() {
+        $patient_id = intval($this->input->post('patient_id'));
+        $patient = $this->M_patient->get_by_id($patient_id);
+        if (!$patient) {
+            echo json_encode(array('status' => 1, 'notif' => 'Data pasien tidak ditemukan! SKBS gagal dibuat.'));
+            return;
+        }
+
+        $docnumb = trim((string) $this->input->post('skbs_docnumb', TRUE));
+        if ($docnumb === '') {
+            echo json_encode(array('status' => 1, 'notif' => 'Silakan isi nomor SKBS!'));
+            return;
+        }
+        if (preg_match('/^0+\s*\//', $docnumb)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Nomor SKBS tidak boleh diawali angka 000!'));
+            return;
+        }
+        if (!$this->M_dokter->is_skbs_docnumb_unique($docnumb)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Nomor SKBS sudah digunakan!'));
+            return;
+        }
+
+        $doctor_id = intval($this->input->post('skbs_doct_id'));
+        $doctor = $this->M_dokter->get_doct_by($doctor_id);
+        if (!$doctor || intval($doctor->level) !== 3 || intval($doctor->status) !== 1) {
+            echo json_encode(array('status' => 1, 'notif' => 'Silakan pilih dokter yang valid!'));
+            return;
+        }
+
+        $result = strtoupper(trim($this->input->post('skbs_result', TRUE)));
+        if (!in_array($result, array('FIT', 'FIT DENGAN CATATAN', 'UNFIT', 'KETERANGAN'), true)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Silakan pilih hasil SKBS yang valid!'));
+            return;
+        }
+
+        $insert_by = $this->session->userdata('sess_id');
+        $data = array(
+            'visit_id'                => null,
+            'skbs_patient_name'       => strtoupper(trim($patient->patient_name)),
+            'skbs_patient_nik'        => $patient->patient_nik,
+            'skbs_patient_department' => $patient->patient_department,
+            'skbs_patient_company'    => $patient->patient_company,
+            'skbs_patient_ktp'        => $patient->patient_ktp,
+            'skbs_patient_age'        => !empty($patient->patient_bod) ? date_diff(date_create($patient->patient_bod), date_create('now'))->y : '0',
+            'skbs_result_id'          => null,
+            'skbs_result_name'        => $result,
+            'skbs_desc'               => trim($this->input->post('skbs_desc', TRUE)),
+            'skbs_note'               => trim($this->input->post('skbs_note', TRUE)),
+            'skbs_td'                 => trim($this->input->post('skbs_td', TRUE)),
+            'skbs_bw'                 => trim($this->input->post('skbs_bw', TRUE)),
+            'skbs_tb'                 => trim($this->input->post('skbs_tb', TRUE)),
+            'skbs_bb'                 => trim($this->input->post('skbs_bb', TRUE)),
+            'skbs_r'                  => trim($this->input->post('skbs_r', TRUE)),
+            'skbs_l'                  => trim($this->input->post('skbs_l', TRUE)),
+            'skbs_koreksi_r'          => trim($this->input->post('skbs_koreksi_r', TRUE)),
+            'skbs_koreksi_l'          => trim($this->input->post('skbs_koreksi_l', TRUE)),
+            'skbs_doc_date'           => date('Y-m-d'),
+            'skbs_docnumb'            => $docnumb,
+            'skbs_doct_id'            => $doctor_id,
+            'skbs_doct_name'          => $doctor->fullname,
+            'skbs_status'             => 1,
+            'insert_dt'               => date('Y-m-d H:i:s'),
+            'insert_by'               => $insert_by,
+        );
+
+        if (!$this->M_dokter->insert_skbs($data)) {
+            echo json_encode(array('status' => 1, 'notif' => 'SKBS gagal dibuat. Silakan coba kembali!'));
+            return;
+        }
+
+        echo json_encode(array(
+            'status' => 2,
+            'notif' => 'SKBS untuk ' . htmlspecialchars($data['skbs_patient_name'], ENT_QUOTES, 'UTF-8') . ' berhasil dibuat! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')',
+        ));
     }
 
     /**
@@ -303,6 +392,12 @@ class Patient extends CI_Controller {
         $timestamp = strtotime($clean);
         if (!$timestamp) return null;
         return date('Y-m-d', $timestamp);
+    }
+
+    private function month_roman($n) {
+        $map = array(1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+                     7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII');
+        return isset($map[$n]) ? $map[$n] : '';
     }
 
 }

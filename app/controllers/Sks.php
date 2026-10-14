@@ -27,7 +27,7 @@ class Sks extends CI_Controller {
             'lib/datepicker/datepicker.min.js',
             'lib/select/chosen.jquery.min.js',
             'lib/mask/jquery.mask.min.js',
-            'src/js/admin/sks.js',
+            'src/js/admin/sks.js?v=' . filemtime(FCPATH . 'src/js/admin/sks.js'),
         );
         $data['panel'] = '<i class="fa fa-file-text"></i> &nbsp;<b>Manajemen SKS</b>';
         $this->l_skin->main($this->dir_v.'view', $data);
@@ -100,7 +100,8 @@ class Sks extends CI_Controller {
     public function add() {
         $dokter = $this->M_sks->get_all_doctor();
         $data['dokter'] = $dokter->result();
-        
+        $data['default_docnumb'] = $this->M_sks->generate_docnumb();
+
         $this->load->view($this->dir_v.'add', $data);
     }
 
@@ -117,6 +118,7 @@ class Sks extends CI_Controller {
         $dokter = $this->M_sks->get_all_doctor();
         $data['dokter']  = $dokter->result();
         $data['patient'] = $patient;
+        $data['default_docnumb'] = $this->M_sks->generate_docnumb();
 
         $this->load->view($this->dir_v.'add', $data);
     }
@@ -151,7 +153,13 @@ class Sks extends CI_Controller {
      * Proses simpan SKS baru
      */
     public function act_add() {
-        
+        $docnumb = trim((string) $this->input->post('docnumb', TRUE));
+        $docnumb_error = $this->validate_docnumb($docnumb);
+        if ($docnumb_error !== '') {
+            echo json_encode(array('status' => 1, 'notif' => $docnumb_error));
+            return;
+        }
+
         if (empty(trim($this->input->post('alamat')))) {
             echo json_encode(array('status' => 1, 'notif' => 'Alamat pasien wajib diisi!'));
             return;
@@ -159,9 +167,18 @@ class Sks extends CI_Controller {
 
         // Ambil patient_job dari ms_patient berdasarkan nama pasien
         $patient_job = $this->M_sks->get_patient_job_by_name($this->input->post('patient_name'));
+        $patient_id = intval($this->input->post('patient_id'));
+        $patient = $patient_id > 0
+            ? $this->db->get_where('ms_patient', array('id_patient' => $patient_id))->row()
+            : null;
+        if ($patient_id > 0 && !$patient) {
+            echo json_encode(array('status' => 1, 'notif' => 'Data pasien tidak ditemukan! SKS gagal dibuat.'));
+            return;
+        }
 
         $data = array(
             'patient_name' => strtoupper(trim($this->input->post('patient_name'))),
+            'patient_nik'  => $patient ? trim($patient->patient_nik) : '',
             'company_name' => strtoupper(trim($this->input->post('company_name'))),
             'patient_job'  => $patient_job ?: 'KARYAWAN',
             'age'          => trim($this->input->post('age')),
@@ -169,7 +186,7 @@ class Sks extends CI_Controller {
             'alamat'       => trim($this->input->post('alamat')),
             'diagnosa'     => strtoupper(trim($this->input->post('diagnosa'))),
             'terapi'       => trim($this->input->post('terapi')),
-            'docnumb'      => $this->M_sks->generate_docnumb(),
+            'docnumb'      => $docnumb,
             'datefrom'     => $this->format_date_db($this->input->post('datefrom')),
             'dateto'       => $this->format_date_db($this->input->post('dateto')),
             'docdate'      => $this->format_date_db($this->input->post('docdate')),
@@ -178,11 +195,14 @@ class Sks extends CI_Controller {
             'insertdt'     => date('Y-m-d H:i:s'),
         );
 
-        $this->M_sks->insert($data);
+        if (!$this->M_sks->insert($data)) {
+            echo json_encode(array('status' => 1, 'notif' => 'SKS gagal dibuat. Silakan coba kembali!'));
+            return;
+        }
 
         echo json_encode(array(
             'status' => 2,
-            'notif'  => 'SKS untuk ' . $data['patient_name'] . ' berhasil ditambahkan! (No. ' . $data['docnumb'] . ')',
+            'notif'  => 'SKS untuk ' . $data['patient_name'] . ' berhasil ditambahkan! (No. ' . htmlspecialchars($data['docnumb'], ENT_QUOTES, 'UTF-8') . ')',
         ));
     }
 
@@ -191,6 +211,18 @@ class Sks extends CI_Controller {
      */
     public function act_edit() {
         $id = intval($this->input->post('id'));
+        $row = $this->M_sks->get_by_id($id);
+        if (!$row) {
+            echo json_encode(array('status' => 1, 'notif' => 'Data SKS tidak ditemukan!'));
+            return;
+        }
+
+        $docnumb = trim((string) $this->input->post('docnumb', TRUE));
+        $docnumb_error = $this->validate_docnumb($docnumb, $id);
+        if ($docnumb_error !== '') {
+            echo json_encode(array('status' => 1, 'notif' => $docnumb_error));
+            return;
+        }
 
         if (empty(trim($this->input->post('alamat')))) {
             echo json_encode(array('status' => 1, 'notif' => 'Alamat pasien wajib diisi!'));
@@ -209,6 +241,7 @@ class Sks extends CI_Controller {
             'alamat'       => trim($this->input->post('alamat')),
             'diagnosa'     => strtoupper(trim($this->input->post('diagnosa'))),
             'terapi'       => trim($this->input->post('terapi')),
+            'docnumb'      => $docnumb,
             'datefrom'     => $this->format_date_db($this->input->post('datefrom')),
             'dateto'       => $this->format_date_db($this->input->post('dateto')),
             'docdate'      => $this->format_date_db($this->input->post('docdate')),
@@ -217,12 +250,28 @@ class Sks extends CI_Controller {
             'updatedt'     => date('Y-m-d H:i:s'),
         );
 
-        $this->M_sks->update($id, $data);
+        if (!$this->M_sks->update($id, $data)) {
+            echo json_encode(array('status' => 1, 'notif' => 'SKS gagal diperbarui. Silakan coba kembali!'));
+            return;
+        }
 
         echo json_encode(array(
             'status' => 2,
-            'notif'  => 'SKS untuk ' . $data['patient_name'] . ' berhasil diperbarui!',
+            'notif'  => 'SKS untuk ' . $data['patient_name'] . ' berhasil diperbarui! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')',
         ));
+    }
+
+    private function validate_docnumb($docnumb, $exclude_id = 0) {
+        if ($docnumb === '') {
+            return 'Silakan isi nomor SKS!';
+        }
+        if (preg_match('/^0+\s*\//', $docnumb)) {
+            return 'Nomor SKS tidak boleh diawali angka 000!';
+        }
+        if (!$this->M_sks->is_docnumb_unique($docnumb, $exclude_id)) {
+            return 'Nomor SKS sudah digunakan!';
+        }
+        return '';
     }
 
     /**

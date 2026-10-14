@@ -133,6 +133,7 @@ $(document).ready(function () {
     $(document).on('click', '#save_edit_btn', function () {
         var payload = {
             id:           $('#edit_id').val(),
+            docnumb:      $('#edit_docnumb').val(),
             patient_name: $('#edit_patient_name').val(),
             company_name: $('#edit_company_name').val(),
             age:          $('#edit_age').val(),
@@ -145,6 +146,14 @@ $(document).ready(function () {
             docdate:      $('#edit_docdate').val(),
             doctby:       $('#edit_doctby').val(),
         };
+        if (!payload.docnumb || !payload.docnumb.trim()) {
+            notifNo('Silahkan isi nomor SKS');
+            return false;
+        }
+        if (/^\s*0+\s*\//.test(payload.docnumb)) {
+            notifNo('Nomor SKS tidak boleh diawali angka 000');
+            return false;
+        }
         if($('#edit_patient_name').val()==''){
 			notifNo("Silahkan isi nama pasien");
             return false;
@@ -185,7 +194,10 @@ $(document).ready(function () {
                 notifYesAuto(res.notif);
                 tabel_sks.ajax.reload(null, false);
             }
-        }, 'json');
+        }, 'json').fail(function (xhr, textStatus, errorThrown) {
+            console.error('Gagal memperbarui SKS:', textStatus, errorThrown);
+            notifNo('SKS gagal diperbarui karena terjadi kesalahan pada server. Silakan coba kembali atau hubungi administrator.');
+        });
     });
 
     // --- Hapus SKS ---

@@ -107,9 +107,9 @@
     <!-- ══════════ KOP SURAT ══════════ -->
     <div class="kop">
         <div class="kop-instansi">PRAKTEK DOKTER UMUM</div>
-        <div class="kop-dokter">dr. Steve Kojongian</div>
+        <div class="kop-dokter">dr. Fitri Afriana</div>
         <div class="kop-alamat">
-            Jl. Trans Sulawesi, Ds. Bahodopi, Kec. Bahodopi, Morowali &nbsp;|&nbsp; Telp. 081342161194
+            Jl. Trans Sulawesi, Desa Labota, Kec. Bahodopi, Kab. Morowali, Sulawesi Tengah &nbsp;|&nbsp; Telp. 085609487216
         </div>
         <hr class="tebal">
         <hr class="tipis">

@@ -1,229 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Cetak SKS</title>
     <style>
-        /* ═══════════════════════════════════════════════════
-           SKS — Desain RESMI (monokrom)
-           ══════════════════════════════════════════════════ */
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 14px;
+            color: #222;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.25;
             margin: 0;
-            padding: 10px 22px;
-            color: #1a1a1a;
+            min-height: 277mm;
+            padding: 0;
+            position: relative;
         }
-
-        /* ── KOP SURAT ────────────────────────────────── */
+        .corner-accent {
+            height: 42mm;
+            left: -2mm;
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            width: 60mm;
+            z-index: 0;
+        }
+        .print-controls {
+            position: fixed;
+            right: 12px;
+            top: 12px;
+            z-index: 2;
+        }
+        .page-content { padding: 24mm 25.4mm 18mm; position: relative; z-index: 1; }
         .kop { text-align: center; }
-        .kop-instansi { font-size: 16px; font-weight: 700; letter-spacing: 1.6px; }
-        .kop-dokter   { font-size: 13px; font-weight: 600; margin-top: 2px; }
-        .kop-alamat   { font-size: 12px; color: #555; margin-top: 2px; }
-        .kop hr.tebal { border: 0; border-top: 2px solid #1a1a1a; margin: 5px 0 0; }
-        .kop hr.tipis { border: 0; border-top: 1px solid #1a1a1a; margin: 2px 0 0; }
-
-        /* ── JUDUL DOKUMEN ────────────────────────────── */
-        .judul { text-align: center; margin: 14px 0; }
+        .kop-instansi { font-size: 14pt; font-weight: 700; text-decoration: underline; }
+        .kop-dokter, .kop-sip { font-size: 11pt; font-weight: 700; margin-top: 1px; }
+        .kop-alamat { font-size: 12pt; margin-top: 1px; }
+        .kop hr { border: 0; border-top: 1px solid #a9ad94; margin: 8px 0 0; }
+        .judul { margin: 8pt 0 18pt; text-align: center; }
         .judul h1 {
+            font-size: 12pt;
             margin: 0;
-            font-size: 17px;
             font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-decoration: underline;
-            text-underline-offset: 5px;
         }
-        .judul .nomor { margin: 5px 0 0; font-size: 15px; }
-
-        /* ── BAGIAN / SECTION ─────────────────────────── */
-        .section { margin-bottom: 9px; }
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            border-bottom: 1px solid #1a1a1a;
-            padding-bottom: 3px;
-            margin-bottom: 5px;
-        }
-        .section-title .angka { display: inline-block; min-width: 30px; }
-
-        /* ── TABEL DATA (tanpa bingkai / garis) ───────── */
-        table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
-        table.data td {
+        .nomor { font-size: 12pt; margin: 2px 0 0; }
+        .pembuka { margin: 0 0 5pt; }
+        .data { border-collapse: collapse; margin: 0; width: 100%; }
+        .data td { padding: 1pt 0; vertical-align: top; }
+        .data .label { padding-left: 5mm; width: 29mm; }
+        .data .pemisah { padding-left: 0; padding-right: 3px; width: 4mm; }
+        .narasi { margin: 12pt 0 6pt; }
+        .tanggal-istirahat { margin: 0 0 6pt; }
+        .penutup { margin: 0; }
+        .ttd { margin: 31px 0 0 auto; page-break-inside: avoid; text-align: center; width: 55mm; }
+        .ttd-tempat, .ttd-peran, .ttd-nama, .ttd-spesialis, .ttd-sip { margin: 0; text-align: center; }
+        .ttd-qr { margin: 0 auto 2mm; text-align: center; }
+        .ttd-qr img { display: block; height: 24mm; margin: 0 auto; width: 24mm; }
+        .ttd-stempel { color: #55789b; font-size: 15px; font-weight: 700; line-height: 1.05; margin: 0; text-align: center; }
+        .ttd-spesialis { color: #55789b; font-size: 12px; }
+        .ttd-nama { font-weight: 700; margin-top: 3px; }
+        .ttd-sip { font-size: 12pt; }
+        .btn-print {
+            background: #222;
             border: 0;
-            padding: 3px 8px;
-            vertical-align: top;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            margin: 0 6px 12px 0;
+            padding: 7px 15px;
         }
-        table.data td.label { width: 170px; font-weight: 600; }
-        table.data td.pemisah { width: 14px; text-align: center; padding-left: 0; padding-right: 0; }
-
-        /* ── NARASI ───────────────────────────────────── */
-        .narasi { font-size: 14px; line-height: 1.7; text-align: justify; margin: 0 0 8px; }
-        .narasi:last-child { margin-bottom: 0; }
-
-        /* ── TANDA TANGAN ─────────────────────────────── */
-        .ttd-wrap { display: flex; justify-content: flex-end; margin-top: 14px; }
-        .ttd-box  { text-align: center; min-width: 240px; }
-        .ttd-place { margin: 0 0 2px; font-size: 14px; }
-        .ttd-role  { margin: 0 0 2px; font-size: 14px; }
-        .ttd-qr    { margin: 8px 0 4px; }
-        .ttd-qr img { width: 80px; height: 80px; display: block; margin: 0 auto; }
-        .ttd-name  { margin: 0; font-size: 14px; font-weight: 700; border-top: 1px solid #1a1a1a; padding-top: 4px; display: inline-block; min-width: 200px; }
-        .ttd-nip   { margin: 3px 0 0; font-size: 12px; color: #555; }
-
-        /* ── FOOTER ───────────────────────────────────── */
-        .footer { margin-top: 14px; border-top: 1px solid #c4c4c4; padding-top: 5px; }
-        .footer p { margin: 0; font-size: 10px; color: #666; text-align: center; font-style: italic; }
-
-        /* ── TOMBOL (hanya tampil di layar) ───────────── */
-        .btn-print { display: inline-block; margin-bottom: 10px; padding: 6px 16px; background: #1a1a1a; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-print:hover { background: #000; }
-
-        /* ── CETAK: kunci ke 1 lembar A4 ──────────────── */
-        @page { size: A4 portrait; margin: 10mm 12mm; }
-
+        @page { size: A4 portrait; margin: 0; }
         @media print {
-            body { padding: 0; }
+            body { min-height: 0; padding: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .corner-accent { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
             .no-print { display: none; }
-            .section, .ttd-wrap, .footer { page-break-inside: avoid; }
+            .kop, .judul, .data, .ttd { page-break-inside: avoid; }
         }
     </style>
 </head>
 <body>
-    <button class="btn-print no-print" onclick="window.print()"><i class="fa fa-print"></i> Print / PDF</button>
-    <button class="btn-print no-print" onclick="window.close()" style="background: #666; margin-left: 6px;">Tutup</button>
+    <svg class="corner-accent" viewBox="0 0 180 136" aria-hidden="true">
+        <polygon points="0,0 180,0 0,136" fill="#BDD7EE"></polygon>
+    </svg>
+    <div class="print-controls no-print">
+        <button class="btn-print" onclick="window.print()">Print / PDF</button>
+        <button class="btn-print" onclick="window.close()">Tutup</button>
+    </div>
 
-    <!-- ══════════ KOP SURAT ══════════ -->
+    <div class="page-content">
+
+    <?php
+    $tanggalNumerik = function ($date) {
+        return !empty($date) && strtotime($date) !== false ? date('j/n/Y', strtotime($date)) : '-';
+    };
+    $bulanIndo = array(
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+    );
+    $formatTanggal = function ($date) use ($bulanIndo) {
+        if (empty($date) || strtotime($date) === false) {
+            return '-';
+        }
+        $timestamp = strtotime($date);
+        return date('j', $timestamp) . ' ' . $bulanIndo[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
+    };
+    $angkaHari = array(
+        1 => 'Satu', 2 => 'Dua', 3 => 'Tiga', 4 => 'Empat', 5 => 'Lima',
+        6 => 'Enam', 7 => 'Tujuh', 8 => 'Delapan', 9 => 'Sembilan',
+        10 => 'Sepuluh', 11 => 'Sebelas', 12 => 'Dua Belas',
+        13 => 'Tiga Belas', 14 => 'Empat Belas', 15 => 'Lima Belas',
+        16 => 'Enam Belas', 17 => 'Tujuh Belas', 18 => 'Delapan Belas',
+        19 => 'Sembilan Belas', 20 => 'Dua Puluh', 21 => 'Dua Puluh Satu',
+        22 => 'Dua Puluh Dua', 23 => 'Dua Puluh Tiga', 24 => 'Dua Puluh Empat',
+        25 => 'Dua Puluh Lima', 26 => 'Dua Puluh Enam', 27 => 'Dua Puluh Tujuh',
+        28 => 'Dua Puluh Delapan', 29 => 'Dua Puluh Sembilan',
+        30 => 'Tiga Puluh', 31 => 'Tiga Puluh Satu',
+    );
+    $lama = 0;
+    if (!empty($row->datefrom) && !empty($row->dateto)) {
+        $lama = max(0, (int) floor((strtotime($row->dateto) - strtotime($row->datefrom)) / 86400) + 1);
+    }
+    $doctorName = !empty($row->fullname) ? trim($row->fullname) : '';
+    $doctorLabel = $doctorName !== '' && stripos($doctorName, 'dr.') !== 0
+        ? 'dr. ' . $doctorName
+        : ($doctorName !== '' ? $doctorName : 'Dokter Pemeriksa');
+    ?>
+
     <div class="kop">
         <div class="kop-instansi">PRAKTEK DOKTER UMUM</div>
-        <div class="kop-dokter">dr. Steve Kojongian</div>
+        <div class="kop-dokter"><?= htmlspecialchars($doctorLabel, ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="kop-sip">No SIP : <?= !empty($row->nip) ? htmlspecialchars($row->nip, ENT_QUOTES, 'UTF-8') : '-' ?></div>
         <div class="kop-alamat">
-            Jl. Trans Sulawesi, Ds. Bahodopi, Kec. Bahodopi, Morowali &nbsp;|&nbsp; Telp. 081342161194
+            Jl. Trans Sulawesi, Ds. Labota<br>
+            Kec. Bahodopi, Kab. Morowali, Sulawesi Tengah<br>
+            No. Telepon: 085609487216
         </div>
-        <hr class="tebal">
-        <hr class="tipis">
+        <hr>
     </div>
 
-    <!-- ══════════ JUDUL DOKUMEN ══════════ -->
     <div class="judul">
-        <h1>SURAT KETERANGAN SAKIT (SKS)</h1>
-        <p class="nomor">No. Dokumen: <?= htmlspecialchars($row->docnumb) ?></p>
+        <h1>SURAT KETERANGAN SAKIT</h1>
+        <p class="nomor">Nomor: <?= htmlspecialchars($row->docnumb, ENT_QUOTES, 'UTF-8') ?></p>
     </div>
 
-    <!-- ══════════ I. IDENTITAS PASIEN ══════════ -->
-    <div class="section">
-        <div class="section-title"><span class="angka">I.</span>Identitas Pasien</div>
-        <table class="data">
-            <tr><td class="label">Nama Pasien</td><td class="pemisah">:</td><td><?= htmlspecialchars($row->patient_name) ?></td></tr>
-            <tr><td class="label">Umur</td><td class="pemisah">:</td><td><?= htmlspecialchars($row->age) ?: '-' ?> Tahun</td></tr>
-            <tr><td class="label">Jenis Kelamin</td><td class="pemisah">:</td><td><?= $row->gender === 'L' ? 'Laki-laki' : ($row->gender === 'P' ? 'Perempuan' : '-') ?></td></tr>
-            <tr><td class="label">Perusahaan</td><td class="pemisah">:</td><td><?= htmlspecialchars($row->company_name) ?: '-' ?></td></tr>
-            <tr><td class="label">Pekerjaan</td><td class="pemisah">:</td><td><?= htmlspecialchars($row->patient_job) ?: '-' ?></td></tr>
-        </table>
-    </div>
+    <p class="pembuka">Dengan ini menerangkan bahwa berdasarkan hasil pemeriksaan yang telah dilakukan kepada pasien:</p>
+    <table class="data">
+        <tr>
+            <td class="label">Nama</td><td class="pemisah">:</td>
+            <td><?= htmlspecialchars($row->patient_name, ENT_QUOTES, 'UTF-8') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Jenis Kelamin</td><td class="pemisah">:</td>
+            <td><?= $row->gender === 'L' ? 'Laki-laki' : ($row->gender === 'P' ? 'Perempuan' : '-') ?></td>
+        </tr>
+        <tr>
+            <td class="label">Umur</td><td class="pemisah">:</td>
+            <td><?= !empty($row->age) ? htmlspecialchars($row->age, ENT_QUOTES, 'UTF-8') . ' Tahun' : '-' ?></td>
+        </tr>
+        <tr>
+            <td class="label">No. ID Card</td><td class="pemisah">:</td>
+            <td><?= !empty($row->patient_nik_for_card) ? htmlspecialchars($row->patient_nik_for_card, ENT_QUOTES, 'UTF-8') : '-' ?></td>
+        </tr>
+        <tr>
+            <td class="label">Pekerjaan</td><td class="pemisah">:</td>
+            <td><?= !empty($row->patient_job) ? htmlspecialchars($row->patient_job, ENT_QUOTES, 'UTF-8') : '-' ?></td>
+        </tr>
+        <tr>
+            <td class="label">Perusahaan</td><td class="pemisah">:</td>
+            <td><?= !empty($row->company_name) ? htmlspecialchars($row->company_name, ENT_QUOTES, 'UTF-8') : '-' ?></td>
+        </tr>
+        <tr>
+            <td class="label">Alamat</td><td class="pemisah">:</td>
+            <td><?= !empty($row->alamat) ? nl2br(htmlspecialchars($row->alamat, ENT_QUOTES, 'UTF-8')) : '-' ?></td>
+        </tr>
+        <tr>
+            <td class="label">Diagnosa</td><td class="pemisah">:</td>
+            <td><?= !empty($row->diagnosa) ? nl2br(htmlspecialchars($row->diagnosa, ENT_QUOTES, 'UTF-8')) : '-' ?></td>
+        </tr>
+        <tr>
+            <td class="label">Terapi</td><td class="pemisah">:</td>
+            <td><?= !empty($row->terapi) ? nl2br(htmlspecialchars($row->terapi, ENT_QUOTES, 'UTF-8')) : '-' ?></td>
+        </tr>
+    </table>
 
-    <!-- ══════════ II. ALAMAT ══════════ -->
-    <div class="section">
-        <div class="section-title"><span class="angka">II.</span>Alamat</div>
-        <table class="data">
-            <tr>
-                <td class="label">Alamat</td><td class="pemisah">:</td>
-                <td><?= !empty($row->alamat) ? nl2br(htmlspecialchars($row->alamat)) : '-' ?></td>
-            </tr>
-        </table>
-    </div>
+    <p class="narasi">
+        Diberikan istirahat sakit selama <strong><?= $lama ?> (<?= isset($angkaHari[$lama]) ? $angkaHari[$lama] : $lama ?>) hari</strong>
+        terhitung mulai tanggal
+    </p>
+    <p class="tanggal-istirahat">
+        <?= $tanggalNumerik($row->datefrom) ?> s.d tanggal <?= $tanggalNumerik($row->dateto) ?>
+    </p>
+    <p class="penutup">Demikian surat keterangan ini diberikan untuk diketahui dan dipergunakan seperlunya.</p>
 
-    <!-- ══════════ III. DIAGNOSA ══════════ -->
-    <div class="section">
-        <div class="section-title"><span class="angka">III.</span>Diagnosa</div>
-        <table class="data">
-            <tr><td class="label">Diagnosa</td><td class="pemisah">:</td><td><?= nl2br(htmlspecialchars($row->diagnosa)) ?></td></tr>
-        </table>
-    </div>
-
-    <!-- ══════════ IV. TERAPI ══════════ -->
-    <div class="section">
-        <div class="section-title"><span class="angka">IV.</span>Terapi</div>
-        <table class="data">
-            <tr><td class="label">Terapi</td><td class="pemisah">:</td><td><?= nl2br(htmlspecialchars($row->terapi)) ?></td></tr>
-        </table>
-    </div>
-
-    <!-- ══════════ V. KETERANGAN DOKTER ══════════ -->
-    <div class="section">
-        <div class="section-title"><span class="angka">V.</span>Keterangan Dokter</div>
-        <?php
-        function tgl_indo($date) {
-            $bulan_indo = array(
-                'January'   => 'Januari',
-                'February'  => 'Februari',
-                'March'     => 'Maret',
-                'April'     => 'April',
-                'May'       => 'Mei',
-                'June'      => 'Juni',
-                'July'      => 'Juli',
-                'August'    => 'Agustus',
-                'September' => 'September',
-                'October'   => 'Oktober',
-                'November'  => 'November',
-                'December'  => 'Desember',
-            );
-            $t = strtotime($date);
-            $d = date('d', $t);
-            $m = $bulan_indo[date('F', $t)];
-            $y = date('Y', $t);
-            return $d . ' ' . $m . ' ' . $y;
-        }
-
-        $datefrom = !empty($row->datefrom) ? tgl_indo($row->datefrom) : '';
-        $dateto   = !empty($row->dateto)   ? tgl_indo($row->dateto)   : '';
-
-        // Hitung lama istirahat (hari)
-        $lama = 0;
-        if (!empty($row->datefrom) && !empty($row->dateto)) {
-            $t1 = strtotime($row->datefrom);
-            $t2 = strtotime($row->dateto);
-            $lama = round(($t2 - $t1) / (60 * 60 * 24)) + 1; // +1 agar termasuk hari pertama
-            if ($lama < 0) $lama = 0;
-        }
-        ?>
-        <p class="narasi">
-            Berdasarkan hasil pemeriksaan medis bahwa benar yang bersangkutan dalam keadaan sakit dan membutuhkan waktu istirahat selama <b><?= $lama ?> (hari)</b>,
-            terhitung tanggal <b><?= $datefrom ?> s/d <?= $dateto ?></b>.
-        </p>
-        <p class="narasi">
-            Demikian surat keterangan ini dibuat untuk dipergunakan sebagaimana perlunya.
-        </p>
-    </div>
-
-    <!-- Tanda Tangan -->
-    <?php
-    $tgl_doc = !empty($row->docdate) ? tgl_indo($row->docdate) : date('d/m/Y');
-    $fullname = !empty($row->doctby) ? htmlspecialchars($row->doctby) : ( !empty($row->insertby) ? htmlspecialchars($row->insertby) : '_________________' );
-    ?>
-    <!-- ══════════ TANDA TANGAN ══════════ -->
-    <div class="ttd-wrap">
-        <div class="ttd-box">
-            <p class="ttd-place">Bahodopi, <?= $tgl_doc ?></p>
-            <p class="ttd-role">Dokter Pemeriksa</p>
-            <div class="ttd-qr"><img src="<?= $qrcode ?>" alt="QR Code"></div>
-            <p class="ttd-name">( <?= htmlspecialchars($row->fullname) ?: $fullname ?> )</p>
-            <?php if (!empty($row->nip)): ?>
-            <p class="ttd-nip">NIP. <?= htmlspecialchars($row->nip) ?></p>
-            <?php endif; ?>
+    <div class="ttd">
+        <p class="ttd-tempat">Labota, <?= $formatTanggal(!empty($row->docdate) ? $row->docdate : date('Y-m-d')) ?></p>
+        <p class="ttd-peran">Dokter Pemeriksa</p>
+        <p class="ttd-nama"><?= htmlspecialchars($doctorLabel, ENT_QUOTES, 'UTF-8') ?></p>
+        <div class="ttd-qr">
+            <img src="<?= htmlspecialchars($qrcode, ENT_QUOTES, 'UTF-8') ?>" alt="QR Code verifikasi SKS">
         </div>
+        <?php if (!empty($row->nip)): ?>
+            <p class="ttd-sip">SIP : <?= htmlspecialchars($row->nip, ENT_QUOTES, 'UTF-8') ?></p>
+        <?php endif; ?>
     </div>
-
-    <div class="footer">
-        <p>
-            Dokumen ini diterbitkan secara elektronik. Untuk memverifikasi keaslian surat ini, silakan pindai <strong>QR Code</strong> di atas menggunakan perangkat mobile Anda.
-        </p>
     </div>
-
     <script>
-        // Auto-trigger print dialog on load (uncomment if desired)
-        // window.onload = function() { window.print(); }
+        var sksDocumentTitle = document.title;
+        window.addEventListener('beforeprint', function () {
+            document.title = '';
+        });
+        window.addEventListener('afterprint', function () {
+            document.title = sksDocumentTitle;
+        });
     </script>
 </body>
 </html>

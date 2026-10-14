@@ -309,10 +309,17 @@ class M_dokter extends CI_Model {
         return $this->db->get_where('sks', array('visit_id' => intval($visit_id)))->row();
     }
 
+    public function is_sks_docnumb_unique($docnumb, $exclude_id = 0) {
+        $this->db->where('docnumb', $docnumb);
+        if ($exclude_id > 0) {
+            $this->db->where('id !=', intval($exclude_id));
+        }
+        return $this->db->get('sks')->num_rows() === 0;
+    }
+
     public function update_sks($id, $data) {
         $this->db->where('id', intval($id));
-        $this->db->update('sks', $data);
-        return $this->db->affected_rows();
+        return $this->db->update('sks', $data);
     }
 
     public function delete_sks($id) {
@@ -349,7 +356,9 @@ class M_dokter extends CI_Model {
      * Insert SKS
      */
     public function insert_sks($data) {
-        $this->db->insert('sks', $data);
+        if (!$this->db->insert('sks', $data)) {
+            return false;
+        }
         return $this->db->insert_id();
     }
 
@@ -363,15 +372,25 @@ class M_dokter extends CI_Model {
         ))->row();
     }
 
+    public function is_skbs_docnumb_unique($docnumb, $exclude_id = 0) {
+        $this->db->where('skbs_docnumb', $docnumb);
+        $this->db->where('skbs_status', 1);
+        if ($exclude_id > 0) {
+            $this->db->where('id_skbs !=', intval($exclude_id));
+        }
+        return $this->db->get('trans_skbs')->num_rows() === 0;
+    }
+
     public function insert_skbs($data) {
-        $this->db->insert('trans_skbs', $data);
+        if (!$this->db->insert('trans_skbs', $data)) {
+            return false;
+        }
         return $this->db->insert_id();
     }
 
     public function update_skbs($id, $data) {
         $this->db->where('id_skbs', intval($id));
-        $this->db->update('trans_skbs', $data);
-        return $this->db->affected_rows();
+        return $this->db->update('trans_skbs', $data);
     }
 
     // ----------------------------------------------------------------
@@ -383,15 +402,24 @@ class M_dokter extends CI_Model {
         ))->row();
     }
 
+    public function is_skmb_docnumb_unique($docnumb, $exclude_id = 0) {
+        $this->db->where('docnumb', $docnumb);
+        if ($exclude_id > 0) {
+            $this->db->where('id !=', intval($exclude_id));
+        }
+        return $this->db->get('skmb')->num_rows() === 0;
+    }
+
     public function insert_skmb($data) {
-        $this->db->insert('skmb', $data);
+        if (!$this->db->insert('skmb', $data)) {
+            return false;
+        }
         return $this->db->insert_id();
     }
 
     public function update_skmb($id, $data) {
         $this->db->where('id', intval($id));
-        $this->db->update('skmb', $data);
-        return $this->db->affected_rows();
+        return $this->db->update('skmb', $data);
     }
 
     public function delete_skmb($id) {

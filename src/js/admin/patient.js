@@ -72,6 +72,28 @@ $(document).ready(function () {
             },
             {
                 data: null,
+                width: '130px',
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return '<button class="ds-btn-daftar skbs-row-btn" data-id="' + row.DT_RowId + '" title="Tambah SKBS">' +
+                               '<i class="fa fa-heartbeat"></i> Tambah SKBS' +
+                           '</button>';
+                }
+            },
+            {
+                data: null,
+                width: '130px',
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return '<button class="ds-btn-daftar skmb-row-btn" data-id="' + row.DT_RowId + '" title="Tambah SKMB">' +
+                               '<i class="fa fa-ambulance"></i> Tambah SKMB' +
+                           '</button>';
+                }
+            },
+            {
+                data: null,
                 width: '80px',
                 orderable: false,
                 className: 'text-center',
@@ -227,6 +249,8 @@ $(document).ready(function () {
 
     $(document).on('click', '#save_sks_btn', function () {
         var payload = {
+            docnumb:      $('#docnumb').val(),
+            patient_id:   $('#patient_id').val(),
             patient_name: $('#patient_name').val(),
             company_name: $('#company_name').val(),
             age:          $('#age').val(),
@@ -239,6 +263,14 @@ $(document).ready(function () {
             docdate:      $('#docdate').val(),
             doctby:       $('#doctby').val(),
         };
+        if (!payload.docnumb || !payload.docnumb.trim()) {
+            notifNo('Silahkan isi nomor SKS');
+            return false;
+        }
+        if (/^\s*0+\s*\//.test(payload.docnumb)) {
+            notifNo('Nomor SKS tidak boleh diawali angka 000');
+            return false;
+        }
         if ($('#patient_name').val() == '') {
             notifNo("Silahkan isi nama pasien");
             return false;
@@ -278,7 +310,132 @@ $(document).ready(function () {
                 $('#MyModal').modal('hide');
                 notifYesAuto(res.notif);
             }
-        }, 'json');
+        }, 'json').fail(function (xhr, textStatus, errorThrown) {
+            console.error('Gagal menyimpan SKS:', textStatus, errorThrown);
+            notifNo('SKS gagal disimpan karena terjadi kesalahan pada server. Silakan coba kembali atau hubungi administrator.');
+        });
+
+    });
+
+    $('#tabel_patient tbody').on('click', '.skbs-row-btn', function () {
+        var id = $(this).data('id');
+        $.get(url_ctrl + 'add_skbs_from_patient/' + id, function (html) {
+            showDsModal(
+                '<i class="fa fa-heartbeat"></i> Tambah SKBS',
+                html,
+                '<button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>' +
+                '<button type="button" class="ds-btn-action ds-btn-green" id="save_patient_skbs_btn" style="padding:8px 22px">Simpan</button>',
+                'modal-lg'
+            );
+        }).fail(function () {
+            notifNo('Form SKBS gagal dimuat. Silakan coba kembali.');
+        });
+    });
+
+    $(document).on('click', '#save_patient_skbs_btn', function () {
+        var payload = {
+            patient_id:       $('#skbs_patient_id').val(),
+            skbs_doct_id:     $('#skbs_doct_id').val(),
+            skbs_docnumb:     $('#skbs_docnumb').val(),
+            skbs_result:      $('#skbs_result').val(),
+            skbs_desc:        $('#skbs_desc').val(),
+            skbs_note:        $('#skbs_note').val(),
+            skbs_td:          $('#skbs_td').val(),
+            skbs_tb:          $('#skbs_tb').val(),
+            skbs_bb:          $('#skbs_bb').val(),
+            skbs_bw:          $('#skbs_bw').val(),
+            skbs_r:           $('#skbs_r').val(),
+            skbs_l:           $('#skbs_l').val(),
+            skbs_koreksi_r:   $('#skbs_koreksi_r').val(),
+            skbs_koreksi_l:   $('#skbs_koreksi_l').val(),
+        };
+        if (!payload.skbs_docnumb || !payload.skbs_docnumb.trim()) {
+            notifNo('Silakan isi nomor SKBS');
+            return false;
+        }
+        if (/^\s*0+\s*\//.test(payload.skbs_docnumb)) {
+            notifNo('Nomor SKBS tidak boleh diawali angka 000');
+            return false;
+        }
+        if (!payload.skbs_doct_id) {
+            notifNo('Silakan pilih dokter');
+            return false;
+        }
+        if (!payload.skbs_result) {
+            notifNo('Silakan pilih hasil SKBS');
+            return false;
+        }
+
+        $.post(url_ctrl + 'act_add_skbs', payload, function (res) {
+            if (res.status == 1) {
+                notifNo(res.notif);
+            } else {
+                $('#MyModal').modal('hide');
+                notifYesAuto(res.notif);
+            }
+        }, 'json').fail(function () {
+            notifNo('SKBS gagal disimpan karena terjadi kesalahan pada server. Silakan coba kembali.');
+        });
+    });
+
+    $('#tabel_patient tbody').on('click', '.skmb-row-btn', function () {
+        var id = $(this).data('id');
+        $.get(site_url + 'skmb/add_from_patient/' + id, function (html) {
+            showDsModal(
+                '<i class="fa fa-ambulance"></i> Tambah SKMB',
+                html,
+                '<button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>' +
+                '<button type="button" class="ds-btn-action ds-btn-green" id="save_patient_skmb_btn" style="padding:8px 22px">Simpan</button>',
+                'modal-md'
+            );
+        }).fail(function () {
+            notifNo('Form SKMB gagal dimuat. Silakan coba kembali.');
+        });
+    });
+
+    $(document).on('click', '#save_patient_skmb_btn', function () {
+        var payload = {
+            patient_id:        $('#patient_id').val(),
+            docnumb:           $('#docnumb').val(),
+            patient_name:      $('#patient_name').val(),
+            nik:               $('#nik').val(),
+            company_name:      $('#company_name').val(),
+            pengantar:         $('#pengantar').val(),
+            nik_pengantar:     $('#nik_pengantar').val(),
+            company_pengantar: $('#company_pengantar').val(),
+            hubungan:          $('#hubungan').val(),
+            tgl_datang:        $('#tgl_datang').val(),
+            jam:               $('#jam').val(),
+            docdate:           $('#docdate').val(),
+            doctby:            $('#doctby').val(),
+        };
+        if (!payload.docnumb || !payload.docnumb.trim() || /^\s*0+\s*\//.test(payload.docnumb)) {
+            notifNo('Isi nomor SKMB yang valid (tidak boleh diawali 000)');
+            return false;
+        }
+        if (!payload.pengantar || !payload.pengantar.trim()) {
+            notifNo('Silakan isi nama pengantar');
+            return false;
+        }
+        if (!payload.tgl_datang || !payload.jam || !payload.hubungan) {
+            notifNo('Silakan lengkapi tanggal, jam, dan hubungan pengantar');
+            return false;
+        }
+        if (!payload.doctby) {
+            notifNo('Silakan pilih dokter');
+            return false;
+        }
+
+        $.post(site_url + 'skmb/act_add', payload, function (res) {
+            if (res.status == 1) {
+                notifNo(res.notif);
+            } else {
+                $('#MyModal').modal('hide');
+                notifYesAuto(res.notif);
+            }
+        }, 'json').fail(function () {
+            notifNo('SKMB gagal disimpan karena terjadi kesalahan pada server. Silakan coba kembali.');
+        });
     });
 
     // --- Lihat Detail Pasien ---

@@ -107,10 +107,12 @@ class Skbs extends CI_Controller {
         $doct = $this->db->get_where('conf_users', array('id_user' => intval($row->skbs_doct_id)))->row();
         $row->nip = $doct ? $doct->nip : '';
 
-        // Generate nomor dokumen
+        // Retain the legacy number for records created before editable numbering was added.
         $month_roman = $this->month_roman(date('n'));
         $year = date('Y');
-        $data['docnumb'] = sprintf('%05d', $row->id_skbs) . '/IMIP-SKBS/' . $month_roman . '/' . $year;
+        $data['docnumb'] = !empty($row->skbs_docnumb)
+            ? $row->skbs_docnumb
+            : sprintf('%05d', $row->id_skbs) . '/IMIP-SKBS/' . $month_roman . '/' . $year;
         $data['row'] = $row;
         $data['qrcode'] = $this->generate_qrcode($id);
 

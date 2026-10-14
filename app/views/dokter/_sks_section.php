@@ -1,3 +1,10 @@
+<?php
+$bulanRomawi = array(
+    1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+    7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+);
+$defaultDocnumb = '000/SKS/ZAF/' . $bulanRomawi[(int) date('n')] . '/' . date('Y');
+?>
 <input type="hidden" id="sks_id" value="<?= $sks ? $sks->id : '' ?>">
 
 <p class="text-muted" style="margin-bottom:12px;">
@@ -9,6 +16,14 @@
 </p>
 
 <div class="row" style="margin: 0 -6px;">
+    <div class="col-md-4" style="padding: 0 6px;">
+        <div class="ds-form-group">
+            <label>Nomor SKS <span class="text-danger">*</span></label>
+            <input type="text" id="sks_docnumb" class="form-control"
+                   value="<?= htmlspecialchars($sks ? $sks->docnumb : $defaultDocnumb, ENT_QUOTES, 'UTF-8') ?>"
+                   placeholder="<?= htmlspecialchars($defaultDocnumb, ENT_QUOTES, 'UTF-8') ?>" maxlength="100" autocomplete="off">
+        </div>
+    </div>
     <div class="col-md-4" style="padding: 0 6px;">
         <div class="ds-form-group">
             <label>Dokter / Petugas <span class="text-danger">*</span></label>

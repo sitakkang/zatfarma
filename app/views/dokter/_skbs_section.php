@@ -1,5 +1,25 @@
 <input type="hidden" id="skbs_id" value="<?= $skbs ? $skbs->id_skbs : '' ?>">
 
+<?php
+$monthRoman = array(
+    1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+    7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+);
+$legacySkbsDocnumb = $skbs
+    ? sprintf('%05d', $skbs->id_skbs) . '/IMIP-SKBS/' . $monthRoman[(int) date('n')] . '/' . date('Y')
+    : '';
+$skbsDocnumb = $skbs && !empty($skbs->skbs_docnumb)
+    ? $skbs->skbs_docnumb
+    : ($skbs ? $legacySkbsDocnumb : $default_skbs_docnumb);
+?>
+<div class="ds-form-group">
+    <label>Nomor SKBS <span class="text-danger">*</span></label>
+    <input type="text" id="skbs_docnumb" class="form-control"
+           value="<?= htmlspecialchars($skbsDocnumb, ENT_QUOTES, 'UTF-8') ?>"
+           placeholder="<?= htmlspecialchars($default_skbs_docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           maxlength="100" autocomplete="off">
+</div>
+
 <div class="row" style="margin: 0 -6px;">
     <div class="col-md-4" style="padding: 0 6px;">
         <div class="ds-form-group">
@@ -131,6 +151,7 @@ function toggleSkbsDesc(el) {
     <table class="ds-table" style="margin-top:0;">
         <thead>
             <tr>
+                <th>No. Dokumen</th>
                 <th>Hasil</th>
                 <th>TD</th>
                 <th>TB</th>
@@ -145,6 +166,7 @@ function toggleSkbsDesc(el) {
         </thead>
         <tbody>
             <tr>
+                <td><?= htmlspecialchars($skbs->skbs_docnumb ?: $legacySkbsDocnumb, ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($skbs->skbs_result_name) ?></td>
                 <td><?= htmlspecialchars($skbs->skbs_td) ?: '-' ?></td>
                 <td><?= htmlspecialchars($skbs->skbs_tb) ?: '-' ?> cm</td>

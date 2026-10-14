@@ -175,6 +175,7 @@ $(document).ready(function () {
     $(document).on('click', '#btn_buat_sks', function () {
         var payload = {
             visit_id:  $('#visit_id_sks').val(),
+            docnumb:   $('#sks_docnumb').val(),
             doctby:    $('#sks_doctby').val(),
             diagnosa:  $('#sks_diagnosa').val(),
             terapi:    $('#sks_terapi').val(),
@@ -183,6 +184,8 @@ $(document).ready(function () {
             dateto:    $('#sks_dateto').val(),
         };
 
+        if (!payload.docnumb || !payload.docnumb.trim()) { notifNo('Silakan isi nomor SKS'); return false; }
+        if (/^\s*0+\s*\//.test(payload.docnumb)) { notifNo('Nomor SKS tidak boleh diawali angka 000'); return false; }
         if (!payload.doctby) { notifNo('Silakan pilih dokter'); return false; }
         if (!payload.diagnosa) { notifNo('Silakan isi diagnosa'); return false; }
         if (!payload.datefrom || !payload.dateto) { notifNo('Silakan isi tanggal berlaku'); return false; }
@@ -194,7 +197,10 @@ $(document).ready(function () {
                 notifYesAuto(res.notif);
                 reloadSksSection();
             }
-        }, 'json');
+        }, 'json').fail(function (xhr, textStatus, errorThrown) {
+            console.error('Gagal menyimpan SKS:', textStatus, errorThrown);
+            notifNo('SKS gagal disimpan karena terjadi kesalahan pada server. Silakan coba kembali atau hubungi administrator.');
+        });
     });
 
     $(document).on('click', '.del-sks-btn', function () {
@@ -225,6 +231,7 @@ $(document).ready(function () {
     $(document).on('click', '#btn_simpan_skbs', function () {
         var payload = {
             visit_id:      $(this).data('visit-id'),
+            skbs_docnumb:  $('#skbs_docnumb').val(),
             skbs_result:   $('#skbs_result').val(),
             skbs_desc:     $('#skbs_desc').val(),
             skbs_note:     $('#skbs_note').val(),
@@ -237,6 +244,8 @@ $(document).ready(function () {
             skbs_koreksi_r:$('#skbs_koreksi_r').val(),
             skbs_koreksi_l:$('#skbs_koreksi_l').val(),
         };
+        if (!payload.skbs_docnumb || !payload.skbs_docnumb.trim()) { notifNo('Silakan isi nomor SKBS'); return false; }
+        if (/^\s*0+\s*\//.test(payload.skbs_docnumb)) { notifNo('Nomor SKBS tidak boleh diawali angka 000'); return false; }
         if (!payload.skbs_result) { notifNo('Silakan pilih hasil'); return false; }
 
         $.post(site_url + 'dokter/act_simpan_skbs', payload, function (res) {
@@ -302,7 +311,8 @@ $(document).ready(function () {
     $(document).on('click', '#btn_simpan_skmb', function () {
         var payload = {
             visit_id:         $(this).data('visit-id'),
-            patient_name:     $('#skmb_patient_name').val(),
+            skmb_docnumb:   $('#skmb_docnumb').val(),
+            patient_name:   $('#skmb_patient_name').val(),
             nik:              $('#skmb_nik').val(),
             company_name:     $('#skmb_company_name').val(),
             pengantar:        $('#skmb_pengantar').val(),
@@ -312,6 +322,8 @@ $(document).ready(function () {
             tgl_datang:       $('#skmb_tgl_datang').val(),
             jam:              $('#skmb_jam').val(),
         };
+        if (!payload.skmb_docnumb || !payload.skmb_docnumb.trim()) { notifNo('Silakan isi nomor SKMB'); return false; }
+        if (/^\s*0+\s*\//.test(payload.skmb_docnumb)) { notifNo('Nomor SKMB tidak boleh diawali angka 000'); return false; }
 
         if (!payload.patient_name) { notifNo('Silakan isi nama yang diantar'); return false; }
         if (!payload.tgl_datang) { notifNo('Silakan isi tanggal datang'); return false; }

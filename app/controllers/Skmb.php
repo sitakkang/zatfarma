@@ -29,7 +29,7 @@ class Skmb extends CI_Controller {
             'lib/select/chosen.jquery.min.js',
             'lib/mask/jquery.mask.min.js',
             'lib/clockpicker/clockpicker.min.js',
-            'src/js/admin/skmb.js',
+            'src/js/admin/skmb.js?v=' . filemtime(FCPATH . 'src/js/admin/skmb.js'),
         );
         $data['panel'] = '<i class="fa fa-ambulance"></i> &nbsp;<b>Manajemen SKMB</b>';
         $this->l_skin->main($this->dir_v.'view', $data);
@@ -93,7 +93,21 @@ class Skmb extends CI_Controller {
     public function add() {
         $dokter = $this->M_skmb->get_all_doctor();
         $data['dokter'] = $dokter->result();
+        $data['default_docnumb'] = $this->M_skmb->generate_docnumb();
         
+        $this->load->view($this->dir_v.'add', $data);
+    }
+
+    public function add_from_patient($id) {
+        $patient = $this->db->get_where('ms_patient', array('id_patient' => intval($id)))->row();
+        if (!$patient) {
+            show_404();
+        }
+
+        $dokter = $this->M_skmb->get_all_doctor();
+        $data['dokter'] = $dokter->result();
+        $data['patient'] = $patient;
+        $data['default_docnumb'] = $this->M_skmb->generate_docnumb();
         $this->load->view($this->dir_v.'add', $data);
     }
 
@@ -127,13 +141,29 @@ class Skmb extends CI_Controller {
      * Proses simpan SKMB baru
      */
     public function act_add() {
+        $docnumb = trim((string) $this->input->post('docnumb', TRUE));
+        $docnumb_error = $this->validate_docnumb($docnumb);
+        if ($docnumb_error !== '') {
+            echo json_encode(array('status' => 1, 'notif' => $docnumb_error));
+            return;
+        }
+
+        $patient_id = intval($this->input->post('patient_id'));
+        $patient = $patient_id > 0
+            ? $this->db->get_where('ms_patient', array('id_patient' => $patient_id))->row()
+            : null;
+        if ($patient_id > 0 && !$patient) {
+            echo json_encode(array('status' => 1, 'notif' => 'Data pasien tidak ditemukan! SKMB gagal dibuat.'));
+            return;
+        }
+
         $doct_by_id = intval($this->input->post('doctby'));
         $doct = $this->db->get_where('conf_users', array('id_user' => $doct_by_id))->row();
 
         $data = array(
-            'patient_name'    => strtoupper(trim($this->input->post('patient_name'))),
-            'nik'             => trim($this->input->post('nik')),
-            'company_name'    => strtoupper(trim($this->input->post('company_name'))),
+            'patient_name'    => strtoupper(trim($patient ? $patient->patient_name : $this->input->post('patient_name'))),
+            'nik'             => trim($patient ? $patient->patient_nik : $this->input->post('nik')),
+            'company_name'    => strtoupper(trim($patient ? $patient->patient_company : $this->input->post('company_name'))),
             'pengantar'       => strtoupper(trim($this->input->post('pengantar'))),
             'nik_pengantar'   => trim($this->input->post('nik_pengantar')),
             'company_pengantar' => strtoupper(trim($this->input->post('company_pengantar'))),
@@ -143,16 +173,19 @@ class Skmb extends CI_Controller {
             'docdate'         => $this->format_date_db($this->input->post('docdate')),
             'doct_by_id'      => $doct_by_id,
             'doct_by_name'    => $doct ? $doct->fullname : '',
-            'docnumb'         => $this->M_skmb->generate_docnumb(),
+            'docnumb'         => $docnumb,
             'insertby'        => $this->session->userdata('sess_id'),
             'insertdt'        => date('Y-m-d H:i:s'),
         );
 
-        $this->M_skmb->insert($data);
+        if (!$this->M_skmb->insert($data)) {
+            echo json_encode(array('status' => 1, 'notif' => 'SKMB gagal dibuat. Silakan coba kembali!'));
+            return;
+        }
 
         echo json_encode(array(
             'status' => 2,
-            'notif'  => 'SKMB untuk ' . $data['patient_name'] . ' berhasil ditambahkan! (No. ' . $data['docnumb'] . ')',
+            'notif'  => 'SKMB untuk ' . $data['patient_name'] . ' berhasil ditambahkan! (No. ' . htmlspecialchars($data['docnumb'], ENT_QUOTES, 'UTF-8') . ')',
         ));
     }
 
@@ -161,6 +194,18 @@ class Skmb extends CI_Controller {
      */
     public function act_edit() {
         $id = intval($this->input->post('id'));
+        if (!$this->M_skmb->get_by_id($id)) {
+            echo json_encode(array('status' => 1, 'notif' => 'Data SKMB tidak ditemukan!'));
+            return;
+        }
+
+        $docnumb = trim((string) $this->input->post('docnumb', TRUE));
+        $docnumb_error = $this->validate_docnumb($docnumb, $id);
+        if ($docnumb_error !== '') {
+            echo json_encode(array('status' => 1, 'notif' => $docnumb_error));
+            return;
+        }
+
         $doct_by_id = intval($this->input->post('doctby'));
         $doct = $this->db->get_where('conf_users', array('id_user' => $doct_by_id))->row();
 
@@ -177,16 +222,33 @@ class Skmb extends CI_Controller {
             'docdate'         => $this->format_date_db($this->input->post('docdate')),
             'doct_by_id'      => $doct_by_id,
             'doct_by_name'    => $doct ? $doct->fullname : '',
+            'docnumb'         => $docnumb,
             'updateby'        => $this->session->userdata('sess_id'),
             'updatedt'        => date('Y-m-d H:i:s'),
         );
 
-        $this->M_skmb->update($id, $data);
+        if (!$this->M_skmb->update($id, $data)) {
+            echo json_encode(array('status' => 1, 'notif' => 'SKMB gagal diperbarui. Silakan coba kembali!'));
+            return;
+        }
 
         echo json_encode(array(
             'status' => 2,
-            'notif'  => 'SKMB untuk ' . $data['patient_name'] . ' berhasil diperbarui!',
+            'notif'  => 'SKMB untuk ' . $data['patient_name'] . ' berhasil diperbarui! (No. ' . htmlspecialchars($docnumb, ENT_QUOTES, 'UTF-8') . ')',
         ));
+    }
+
+    private function validate_docnumb($docnumb, $exclude_id = 0) {
+        if ($docnumb === '') {
+            return 'Silakan isi nomor SKMB!';
+        }
+        if (preg_match('/^0+\s*\//', $docnumb)) {
+            return 'Nomor SKMB tidak boleh diawali angka 000!';
+        }
+        if (!$this->M_skmb->is_docnumb_unique($docnumb, $exclude_id)) {
+            return 'Nomor SKMB sudah digunakan!';
+        }
+        return '';
     }
 
     /**

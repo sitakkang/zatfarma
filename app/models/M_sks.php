@@ -91,9 +91,11 @@ class M_sks extends CI_Model {
     }
 
     public function get_sks_by_id($id) {
-        $this->db->select('sks.*, doctor.fullname AS fullname, doctor.nip AS nip, creator.fullname AS insert_name, updater.fullname AS update_name');
+        $this->db->select('sks.*, doctor.fullname AS fullname, doctor.nip AS nip, COALESCE(NULLIF(sks.patient_nik, \'\'), patient.patient_nik) AS patient_nik_for_card, creator.fullname AS insert_name, updater.fullname AS update_name');
         $this->db->from('sks');
         $this->db->join('conf_users AS doctor', 'sks.doctby = doctor.id_user', 'left');
+        $this->db->join('trans_visit AS visit', 'sks.visit_id = visit.id_visit', 'left');
+        $this->db->join('ms_patient AS patient', 'visit.patient_id = patient.id_patient', 'left');
         $this->db->join('conf_users AS creator', 'sks.insertby = creator.id_user', 'left');
         $this->db->join('conf_users AS updater', 'sks.updateby = updater.id_user', 'left');
         $this->db->where('sks.id', $id);
@@ -118,7 +120,9 @@ class M_sks extends CI_Model {
      * Insert new SKS
      */
     public function insert($data) {
-        $this->db->insert($this->table, $data);
+        if (!$this->db->insert($this->table, $data)) {
+            return false;
+        }
         return $this->db->insert_id();
     }
 
@@ -127,8 +131,7 @@ class M_sks extends CI_Model {
      */
     public function update($id, $data) {
         $this->db->where('id', intval($id));
-        $this->db->update($this->table, $data);
-        return $this->db->affected_rows();
+        return $this->db->update($this->table, $data);
     }
 
     /**
@@ -152,29 +155,12 @@ class M_sks extends CI_Model {
     }
 
     /**
-     * Generate nomor dokumen otomatis (running number per bulan)
-     * Format: 00001/SKS/VII/2026
+     * Default nomor dokumen SKS yang dapat disesuaikan sebelum disimpan.
      */
     public function generate_docnumb() {
         $month = date('n');  // 1–12
         $year  = date('Y');
-
-        // Cari nomor terakhir di bulan & tahun ini
-        $last = $this->db->query(
-            "SELECT docnumb FROM sks
-             WHERE docnumb LIKE '%/SKS/" . $this->db->escape_like_str($this->month_roman($month)) . "/$year'
-             ORDER BY id DESC LIMIT 1"
-        )->row();
-
-        if ($last) {
-            // Ambil angka dari depan: 00001/SKS/...
-            $parts = explode('/', $last->docnumb);
-            $next  = intval($parts[0]) + 1;
-        } else {
-            $next = 1;
-        }
-
-        return sprintf('%05d', $next) . '/SKS/' . $this->month_roman($month) . '/' . $year;
+        return '000/SKS/ZAF/' . $this->month_roman($month) . '/' . $year;
     }
 
     /**

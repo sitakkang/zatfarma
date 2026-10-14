@@ -1,6 +1,13 @@
 <input type="hidden" id="edit_id" name="id" value="<?= $row->id ?>">
 
 <div class="ds-form-group">
+    <label>Nomor SKS <span class="text-danger">*</span></label>
+    <input type="text" id="edit_docnumb" name="docnumb" class="form-control"
+           value="<?= htmlspecialchars($row->docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           maxlength="100" autocomplete="off">
+</div>
+
+<div class="ds-form-group">
     <label>Nama Pasien <span class="text-danger">*</span></label>
     <input type="text" id="edit_patient_name" name="patient_name" class="form-control"
            value="<?= htmlspecialchars($row->patient_name) ?>" maxlength="200" autocomplete="off">

@@ -107,7 +107,9 @@ class M_skmb extends CI_Model {
      * Insert new SKMB
      */
     public function insert($data) {
-        $this->db->insert($this->table, $data);
+        if (!$this->db->insert($this->table, $data)) {
+            return false;
+        }
         return $this->db->insert_id();
     }
 
@@ -116,8 +118,7 @@ class M_skmb extends CI_Model {
      */
     public function update($id, $data) {
         $this->db->where('id', intval($id));
-        $this->db->update($this->table, $data);
-        return $this->db->affected_rows();
+        return $this->db->update($this->table, $data);
     }
 
     /**
@@ -141,28 +142,12 @@ class M_skmb extends CI_Model {
     }
 
     /**
-     * Generate nomor dokumen otomatis (running number per bulan)
-     * Format: 00001/SKMB/VII/2026
+     * Default nomor dokumen SKMB yang dapat disesuaikan sebelum disimpan.
      */
     public function generate_docnumb() {
         $month = date('n');  // 1–12
         $year  = date('Y');
-
-        // Cari nomor terakhir di bulan & tahun ini
-        $last = $this->db->query(
-            "SELECT docnumb FROM skmb
-             WHERE docnumb LIKE '%/SKMB/" . $this->db->escape_like_str($this->month_roman($month)) . "/$year'
-             ORDER BY id DESC LIMIT 1"
-        )->row();
-
-        if ($last) {
-            $parts = explode('/', $last->docnumb);
-            $next  = intval($parts[0]) + 1;
-        } else {
-            $next = 1;
-        }
-
-        return sprintf('%05d', $next) . '/SKMB/' . $this->month_roman($month) . '/' . $year;
+        return '000/SKMB/ZAF/' . $this->month_roman($month) . '/' . $year;
     }
 
     /**

@@ -1,4 +1,15 @@
 <div class="ds-form-group">
+    <label>Nomor SKMB <span class="text-danger">*</span></label>
+    <input type="text" id="docnumb" name="docnumb" class="form-control"
+           value="<?= htmlspecialchars($default_docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           placeholder="<?= htmlspecialchars($default_docnumb, ENT_QUOTES, 'UTF-8') ?>"
+           maxlength="100" autocomplete="off">
+</div>
+<?php if (isset($patient)): ?>
+    <input type="hidden" id="patient_id" name="patient_id" value="<?= intval($patient->id_patient) ?>">
+<?php endif; ?>
+
+<div class="ds-form-group">
     <label>Pengantar <span class="text-danger">*</span></label>
     <input type="text" id="pengantar" name="pengantar" class="form-control"
            placeholder="Nama lengkap pengantar" maxlength="200" autocomplete="off">
@@ -26,6 +37,7 @@
 <div class="ds-form-group">
     <label>Nama Diantar <span class="text-danger">*</span></label>
     <input type="text" id="patient_name" name="patient_name" class="form-control"
+           value="<?= isset($patient) ? htmlspecialchars($patient->patient_name, ENT_QUOTES, 'UTF-8') : '' ?>"
            placeholder="Nama lengkap yang diantar" maxlength="200" autocomplete="off">
 </div>
 
@@ -34,6 +46,7 @@
         <div class="ds-form-group">
             <label>NIK Diantar</label>
             <input type="text" id="nik" name="nik" class="form-control"
+                   value="<?= isset($patient) ? htmlspecialchars($patient->patient_nik, ENT_QUOTES, 'UTF-8') : '' ?>"
                    placeholder="Nomor induk karyawan" maxlength="50" autocomplete="off">
         </div>
     </div>
@@ -41,6 +54,7 @@
         <div class="ds-form-group">
             <label>Perusahaan Diantar</label>
             <input type="text" id="company_name" name="company_name" class="form-control"
+                   value="<?= isset($patient) ? htmlspecialchars($patient->patient_company, ENT_QUOTES, 'UTF-8') : '' ?>"
                    placeholder="Nama perusahaan" maxlength="200" autocomplete="off">
         </div>
     </div>

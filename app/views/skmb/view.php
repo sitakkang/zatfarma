@@ -11,11 +11,6 @@
                 <p class="ds-page-header-desc">Kelola Surat Keterangan Mengantar Berobat (SKMB)</p>
             </div>
         </div>
-        <div class="ds-page-header-end">
-            <button class="ds-btn-header" id="add_btn">
-                <i class="fa fa-plus-circle"></i> Tambah SKMB
-            </button>
-        </div>
     </div>
 
     <!-- Table Card -->

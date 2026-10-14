@@ -77,7 +77,8 @@ INSERT INTO `conf_menu` (`id_menu`, `icon`, `icon2`, `name`, `link`, `status`, `
 (14, 'fa-book-open', NULL, 'SKBS', 'skbs', 1, 1, 1, '\"1\",\"2\",\"3\"', 8),
 (15, 'fa-newspaper', NULL, 'SKMB', 'skmb', 1, 1, 1, '\"1\",\"2\",\"3\"', 9),
 (16, 'fa-chart-pie', NULL, 'Laporan Obat Harian', 'reportobat', 1, 1, 1, '\"1\",\"2\",\"3\"', 12),
-(17, 'fa-chart-bar', NULL, 'Laporan Obat Bulanan', 'monthlyobat', 1, 1, 1, '\"1\",\"2\",\"3\"', 13);
+(17, 'fa-chart-bar', NULL, 'Laporan Obat Bulanan', 'monthlyobat', 1, 1, 1, '\"1\",\"2\",\"3\"', 13),
+(20, 'fa-notes-medical', NULL, 'Riwayat Rekam Medis', 'history_medical', 1, 1, 1, '\"1\",\"2\",\"3\"', 16);
 
 -- --------------------------------------------------------
 
@@ -553,6 +554,7 @@ CREATE TABLE `sks` (
   `updateby` varchar(100) DEFAULT NULL,
   `updatedt` datetime DEFAULT NULL,
   `patient_name` varchar(200) NOT NULL,
+  `patient_nik` varchar(20) DEFAULT NULL,
   `company_name` varchar(225) DEFAULT NULL,
   `gender` enum('L','P') DEFAULT NULL,
   `age` varchar(225) DEFAULT NULL,
@@ -577,9 +579,9 @@ CREATE TABLE `sks` (
 -- Dumping data for table `sks`
 --
 
-INSERT INTO `sks` (`id`, `insertby`, `insertdt`, `updateby`, `updatedt`, `patient_name`, `company_name`, `gender`, `age`, `desa`, `kecamatan_id`, `kecamatan`, `kelurahan_id`, `kelurahan`, `kabupaten`, `provinsi`, `diagnosa`, `terapi`, `datefrom`, `dateto`, `docdate`, `doctby`, `docnumb`, `visit_id`) VALUES
-(25, '1', '2026-07-22 13:45:13', NULL, NULL, 'PATAR S', 'PT IMIP', 'L', '36', 'FATUFIA', 3, 'BAHODOPI', 55, 'FATUFIA', 'MOROWALI', 'SULAWESI TENGAH', '1. SLOW VIRUS INFECTION OF CENTRAL NERVOUS SYSTEM, UNSPECIFIED\n2. AMOEBIC INFECTION OF OTHER SITES', '1. AMBROXOL 15 MG/5 ML SYRUP\n2. AMBEVEN (ANTI-HEMORRHOID) 1 x 1', '2026-07-22', '2026-07-22', '2026-07-22', '4', '00001/SKS/VII/2026', 7),
-(26, '4', '2026-07-23 00:09:56', NULL, NULL, 'PATAR S', 'PT IMIP', 'L', '36', 'FATUFIA', 3, 'BAHODOPI', 55, 'FATUFIA', 'MOROWALI', 'SULAWESI TENGAH', '1. AMOEBIC INFECTION OF OTHER SITES', '1. AMBROXOL 15 MG/5 ML SYRUP 1 x 1', '2026-07-23', '2026-07-23', '2026-07-23', '4', '00002/SKS/VII/2026', 8);
+INSERT INTO `sks` (`id`, `insertby`, `insertdt`, `updateby`, `updatedt`, `patient_name`, `patient_nik`, `company_name`, `gender`, `age`, `desa`, `kecamatan_id`, `kecamatan`, `kelurahan_id`, `kelurahan`, `kabupaten`, `provinsi`, `diagnosa`, `terapi`, `datefrom`, `dateto`, `docdate`, `doctby`, `docnumb`, `visit_id`) VALUES
+(25, '1', '2026-07-22 13:45:13', NULL, NULL, 'PATAR S', NULL, 'PT IMIP', 'L', '36', 'FATUFIA', 3, 'BAHODOPI', 55, 'FATUFIA', 'MOROWALI', 'SULAWESI TENGAH', '1. SLOW VIRUS INFECTION OF CENTRAL NERVOUS SYSTEM, UNSPECIFIED\n2. AMOEBIC INFECTION OF OTHER SITES', '1. AMBROXOL 15 MG/5 ML SYRUP\n2. AMBEVEN (ANTI-HEMORRHOID) 1 x 1', '2026-07-22', '2026-07-22', '2026-07-22', '4', '00001/SKS/VII/2026', 7),
+(26, '4', '2026-07-23 00:09:56', NULL, NULL, 'PATAR S', NULL, 'PT IMIP', 'L', '36', 'FATUFIA', 3, 'BAHODOPI', 55, 'FATUFIA', 'MOROWALI', 'SULAWESI TENGAH', '1. AMOEBIC INFECTION OF OTHER SITES', '1. AMBROXOL 15 MG/5 ML SYRUP 1 x 1', '2026-07-23', '2026-07-23', '2026-07-23', '4', '00002/SKS/VII/2026', 8);
 
 -- --------------------------------------------------------
 
@@ -832,6 +834,7 @@ CREATE TABLE `trans_skbs` (
   `skbs_koreksi_r` varchar(100) DEFAULT NULL,
   `skbs_koreksi_l` varchar(100) DEFAULT NULL,
   `skbs_doc_date` date DEFAULT NULL,
+  `skbs_docnumb` varchar(100) DEFAULT NULL,
   `skbs_doct_id` int(11) DEFAULT NULL,
   `skbs_doct_name` varchar(100) DEFAULT NULL,
   `skbs_status` int(11) DEFAULT 1,

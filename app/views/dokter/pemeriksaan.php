@@ -277,6 +277,7 @@ if (!empty($row->patient_bod)) {
                                 <?php $this->load->view('dokter/_skbs_section', array(
                                     'row' => $row,
                                     'skbs' => $skbs,
+                                    'default_skbs_docnumb' => $default_skbs_docnumb,
                                     'dokter_list' => $dokter_list,
                                 )); ?>
                             </div>
@@ -291,6 +292,7 @@ if (!empty($row->patient_bod)) {
                                 <?php $this->load->view('dokter/_skmb_section', array(
                                     'row' => $row,
                                     'skmb' => $skmb,
+                                    'default_skmb_docnumb' => $default_skmb_docnumb,
                                     'dokter_list' => $dokter_list,
                                 )); ?>
                             </div>
