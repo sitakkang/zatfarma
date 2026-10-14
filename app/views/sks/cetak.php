@@ -47,6 +47,7 @@
         .data { border-collapse: collapse; margin: 0; width: 100%; }
         .data td { padding: 1pt 0; vertical-align: top; }
         .data .label { padding-left: 5mm; width: 29mm; }
+        .data .label-gender { white-space: nowrap; width: 36mm; }
         .data .pemisah { padding-left: 0; padding-right: 3px; width: 4mm; }
         .narasi { margin: 12pt 0 6pt; }
         .tanggal-istirahat { margin: 0 0 6pt; }
@@ -150,7 +151,7 @@
             <td><?= htmlspecialchars($row->patient_name, ENT_QUOTES, 'UTF-8') ?></td>
         </tr>
         <tr>
-            <td class="label">Jenis Kelamin</td><td class="pemisah">:</td>
+            <td class="label label-gender">Jenis Kelamin</td><td class="pemisah">:</td>
             <td><?= $row->gender === 'L' ? 'Laki-laki' : ($row->gender === 'P' ? 'Perempuan' : '-') ?></td>
         </tr>
         <tr>
@@ -164,10 +165,6 @@
         <tr>
             <td class="label">Pekerjaan</td><td class="pemisah">:</td>
             <td><?= !empty($row->patient_job) ? htmlspecialchars($row->patient_job, ENT_QUOTES, 'UTF-8') : '-' ?></td>
-        </tr>
-        <tr>
-            <td class="label">Perusahaan</td><td class="pemisah">:</td>
-            <td><?= !empty($row->company_name) ? htmlspecialchars($row->company_name, ENT_QUOTES, 'UTF-8') : '-' ?></td>
         </tr>
         <tr>
             <td class="label">Alamat</td><td class="pemisah">:</td>
