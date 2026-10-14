@@ -39,7 +39,13 @@ class M_pharmacy extends CI_Model {
                     B.trans_patient_code,
                     B.trans_patient_company,
                     B.trans_patient_phone,
+                    B.trans_doc,
                     C.patient_name,
+                    C.patient_nik,
+                    C.patient_ktp,
+                    C.patient_gender,
+                    C.patient_bod,
+                    C.patient_address,
                     D.fullname AS doct_name
                 FROM trans_medical_record A
                 LEFT JOIN trans_visit B ON A.visit_id = B.id_visit

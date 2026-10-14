@@ -100,6 +100,22 @@ class Pharmacy extends CI_Controller {
     }
 
     /**
+     * Print prescription by medical record.
+     */
+    public function cetak($mrd_id) {
+        $mrd_id = intval($mrd_id);
+        $data['row'] = $this->M_pharmacy->get_medical_record($mrd_id);
+        if (!$data['row']) {
+            show_404();
+        }
+
+        $data['obat'] = $this->M_pharmacy->get_obat_racikan($mrd_id);
+        $data['racikan'] = $this->M_pharmacy->get_pulv_list($mrd_id);
+        $data['pulv_items'] = $this->M_pharmacy->get_pulv_items_grouped($mrd_id);
+        $this->load->view($this->dir_v.'cetak', $data);
+    }
+
+    /**
      * Konversi tanggal dd/mm/yyyy ke yyyy-mm-dd
      */
     private function format_date_db($date) {

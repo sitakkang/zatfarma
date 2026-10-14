@@ -39,13 +39,18 @@ $(document).ready(function () {
             { data: '5', className: 'text-center' },
             {
                 data: null,
-                width: '80px',
+                width: '110px',
                 orderable: false,
                 className: 'text-center',
                 render: function (data, type, row) {
-                    return '<button class="ds-act-btn ds-act-view detail-row-btn" data-mrd="' + row.id_medical_record + '" title="Lihat Detail Obat & Racikan">' +
+                    return '<div class="ds-act-group">' +
+                           '<button class="ds-act-btn ds-act-view detail-row-btn" data-mrd="' + row.id_medical_record + '" title="Lihat Detail Obat & Racikan">' +
                                '<i class="fa fa-eye"></i>' +
-                           '</button>';
+                           '</button>' +
+                           '<button class="ds-act-btn ds-act-print print-resep-btn" data-mrd="' + row.id_medical_record + '" title="Cetak Resep">' +
+                               '<i class="fa fa-print"></i>' +
+                           '</button>' +
+                           '</div>';
                 }
             }
         ],
@@ -99,6 +104,11 @@ $(document).ready(function () {
                 'modal-md'
             );
         });
+    });
+
+    $('#tabel_pharmacy tbody').on('click', '.print-resep-btn', function () {
+        var mrd_id = $(this).data('mrd');
+        window.open(site_url + 'pharmacy/cetak/' + encodeURIComponent(mrd_id), '_blank');
     });
 
 });

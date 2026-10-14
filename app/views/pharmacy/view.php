@@ -48,7 +48,7 @@
                             <th width="180">Perusahaan</th>
                             <th width="120">No. Telepon</th>
                             <th width="110" class="text-center">Tgl. Kunjungan</th>
-                            <th width="80" class="text-center">Aksi</th>
+                            <th width="110" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
