@@ -236,10 +236,6 @@
         <!-- Footer -->
         <div class="v-footer">
             <span>Diterbitkan oleh Apotek Zaf Farma</span>
-            <span class="v-footer-seal">
-                <span>&#9679;</span>
-                <?= !empty($row->insert_dt) ? date('d-m-Y H:i', strtotime($row->insert_dt)) : '-' ?>
-            </span>
         </div>
     </div>
 </body>
