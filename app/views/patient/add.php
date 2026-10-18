@@ -9,7 +9,7 @@
         <div class="ds-form-group">
             <label>NIK</label>
             <input type="text" id="patient_nik" name="patient_nik" class="form-control"
-                   placeholder="Nomor Induk Karyawan" maxlength="10" autocomplete="off">
+                   placeholder="Nomor Induk Karyawan" autocomplete="off">
         </div>
     </div>
     <div class="col-md-6" style="padding: 0 6px;">

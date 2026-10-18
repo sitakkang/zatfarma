@@ -11,7 +11,7 @@
         <div class="ds-form-group">
             <label>NIK</label>
             <input type="text" id="edit_patient_nik" name="patient_nik" class="form-control"
-                   value="<?= htmlspecialchars($row->patient_nik) ?>" maxlength="10" autocomplete="off">
+                   value="<?= htmlspecialchars($row->patient_nik) ?>" autocomplete="off">
         </div>
     </div>
     <div class="col-md-6" style="padding: 0 6px;">
