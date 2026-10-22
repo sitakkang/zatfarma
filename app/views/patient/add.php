@@ -33,7 +33,7 @@
         <div class="ds-form-group">
             <label>Pekerjaan</label>
             <input type="text" id="patient_job" name="patient_job" class="form-control"
-                   value="KARYAWAN" placeholder="Pekerjaan pasien" maxlength="100" autocomplete="off">
+                   value="Karyawan Swasta" placeholder="Pekerjaan pasien" maxlength="100" autocomplete="off">
         </div>
     </div>
 </div>
