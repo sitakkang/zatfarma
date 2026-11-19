@@ -26,16 +26,23 @@ class M_reportvisit extends CI_Model {
 
     /**
      * Get patient list by date
+     *
+     * Diagnosa digabung menjadi satu nilai dengan pemisah newline
      */
     public function get_patients_by_date($date) {
         $sql = "SELECT 
                     C.trans_patient_code,
                     D.patient_name,
                     D.patient_gender,
+                    D.patient_bod,
                     C.trans_patient_company,
                     C.trans_patient_phone,
                     C.trans_doc,
-                    E.fullname AS doct_name
+                    E.fullname AS doct_name,
+                    (SELECT GROUP_CONCAT(DG.trans_dgn_name ORDER BY DG.id_trans_dgn SEPARATOR '\\n')
+                     FROM trans_diagnosa DG
+                     WHERE DG.medical_record_id = A.id_medical_record
+                       AND DG.trans_dgn_status = 1) AS diagnosa
                 FROM trans_medical_record A
                 LEFT JOIN trans_visit C ON A.visit_id = C.id_visit
                 LEFT JOIN ms_patient D ON C.patient_id = D.id_patient

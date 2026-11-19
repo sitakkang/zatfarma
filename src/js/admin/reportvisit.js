@@ -126,4 +126,10 @@ $(document).ready(function () {
         });
     });
 
+    // --- Download detail pasien (modal) ---
+    $(document).on('click', '.patient-list-download', function () {
+        var tgl = $(this).data('tgl');
+        window.open(site_url + 'reportvisit/download_patient_list?date=' + encodeURIComponent(tgl), '_blank');
+    });
+
 });

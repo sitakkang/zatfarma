@@ -92,9 +92,90 @@ class Reportvisit extends CI_Controller {
         }
 
         $date_db = $this->format_date_db($date);
-        $data['rows'] = $this->M_reportvisit->get_patients_by_date($date_db);
-        $data['tgl'] = $date;
+        $result  = $this->M_reportvisit->get_patients_by_date($date_db);
+
+        $rows = array();
+        foreach ($result->result() as $row) {
+            $row->umur          = $this->hitung_umur($row->patient_bod, $row->trans_doc);
+            $row->diagnosa_list = $this->split_diagnosa($row->diagnosa);
+            $rows[] = $row;
+        }
+
+        $data['rows'] = $rows;
+        $data['tgl']  = $date;
         $this->load->view($this->dir_v.'patient_list', $data);
+    }
+
+    /**
+     * Download detail pasien per tanggal (Excel)
+     */
+    public function download_patient_list() {
+        $date = trim($this->input->get('date'));
+
+        if (empty($date)) {
+            show_404();
+        }
+
+        $date_db = $this->format_date_db($date);
+        $rows    = $this->M_reportvisit->get_patients_by_date($date_db);
+
+        $filename = 'Detail_Kunjungan_' . str_replace('/', '-', $date) . '.xls';
+
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        echo '<html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+              <head><meta charset="UTF-8">
+              <style>td { mso-number-format:"\@"; }</style>
+              </head><body>';
+        echo '<table border="1">';
+        echo '<thead>';
+        echo '<tr style="background:#2d6a4f;color:#fff;">';
+        echo '<th>No</th>';
+        echo '<th>No. RM</th>';
+        echo '<th>Nama Pasien</th>';
+        echo '<th>JK</th>';
+        echo '<th>Umur</th>';
+        echo '<th>Perusahaan</th>';
+        echo '<th>Telepon</th>';
+        echo '<th>Dokter</th>';
+        echo '<th>Diagnosa</th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody>';
+
+        $no = 1;
+
+        foreach ($rows->result() as $row) {
+            $age  = $this->hitung_umur($row->patient_bod, $row->trans_doc);
+            $dgn  = $this->split_diagnosa($row->diagnosa);
+            $cell = '-';
+            if (!empty($dgn)) {
+                foreach ($dgn as $k => $item) {
+                    $dgn[$k] = '• ' . htmlspecialchars($item);
+                }
+                $cell = implode('<br />', $dgn);
+            }
+
+            echo '<tr>';
+            echo '<td style="vertical-align:top;text-align:center;">' . $no++ . '</td>';
+            echo '<td style="vertical-align:top;">' . htmlspecialchars($row->trans_patient_code) . '</td>';
+            echo '<td style="vertical-align:top;">' . htmlspecialchars($row->patient_name) . '</td>';
+            echo '<td style="vertical-align:top;text-align:center;">' . ($row->patient_gender === 'L' ? 'Laki-laki' : ($row->patient_gender === 'P' ? 'Perempuan' : '-')) . '</td>';
+            echo '<td style="vertical-align:top;text-align:center;">' . ($age !== '' ? $age . ' Thn' : '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . (htmlspecialchars($row->trans_patient_company) ?: '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . (htmlspecialchars($row->trans_patient_phone) ?: '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . (htmlspecialchars($row->doct_name) ?: '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . $cell . '</td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody>';
+        echo '</table>';
+        echo '</body></html>';
     }
 
     /**
@@ -156,6 +237,31 @@ class Reportvisit extends CI_Controller {
         echo '</tfoot>';
         echo '</table>';
         echo '</body></html>';
+    }
+
+    /**
+     * Pecah teks diagnosa (pemisah newline) menjadi array
+     */
+    private function split_diagnosa($text) {
+        if (empty($text)) return array();
+        $items = preg_split('/\r\n|\r|\n/', $text);
+        $result = array();
+        foreach ($items as $item) {
+            $item = trim($item);
+            if ($item !== '') $result[] = $item;
+        }
+        return $result;
+    }
+
+    /**
+     * Hitung umur (tahun) pada tanggal referensi
+     */
+    private function hitung_umur($bod, $ref_date = null) {
+        if (empty($bod) || $bod === '0000-00-00') return '';
+        $birth = date_create($bod);
+        $ref   = !empty($ref_date) ? date_create($ref_date) : date_create('now');
+        if (!$birth || !$ref) return '';
+        return $ref->diff($birth)->y;
     }
 
     /**
