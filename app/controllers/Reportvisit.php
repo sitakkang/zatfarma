@@ -85,7 +85,7 @@ class Reportvisit extends CI_Controller {
      * Ambil daftar pasien berdasarkan tanggal (via AJAX)
      */
     public function patient_list() {
-        $date = trim($this->input->get('date'));
+        $date = trim((string) $this->input->get('date'));
         if (empty($date)) {
             echo 'Tanggal tidak valid';
             return;
@@ -110,7 +110,7 @@ class Reportvisit extends CI_Controller {
      * Download detail pasien per tanggal (Excel)
      */
     public function download_patient_list() {
-        $date = trim($this->input->get('date'));
+        $date = trim((string) $this->input->get('date'));
 
         if (empty($date)) {
             show_404();
@@ -155,20 +155,20 @@ class Reportvisit extends CI_Controller {
             $cell = '-';
             if (!empty($dgn)) {
                 foreach ($dgn as $k => $item) {
-                    $dgn[$k] = '• ' . htmlspecialchars($item);
+                    $dgn[$k] = '• ' . htmlspecialchars((string) $item);
                 }
                 $cell = implode('<br />', $dgn);
             }
 
             echo '<tr>';
             echo '<td style="vertical-align:top;text-align:center;">' . $no++ . '</td>';
-            echo '<td style="vertical-align:top;">' . htmlspecialchars($row->trans_patient_code) . '</td>';
-            echo '<td style="vertical-align:top;">' . htmlspecialchars($row->patient_name) . '</td>';
+            echo '<td style="vertical-align:top;">' . htmlspecialchars((string) $row->trans_patient_code) . '</td>';
+            echo '<td style="vertical-align:top;">' . htmlspecialchars((string) $row->patient_name) . '</td>';
             echo '<td style="vertical-align:top;text-align:center;">' . ($row->patient_gender === 'L' ? 'Laki-laki' : ($row->patient_gender === 'P' ? 'Perempuan' : '-')) . '</td>';
             echo '<td style="vertical-align:top;text-align:center;">' . ($age !== '' ? $age . ' Thn' : '-') . '</td>';
-            echo '<td style="vertical-align:top;">' . (htmlspecialchars($row->trans_patient_company) ?: '-') . '</td>';
-            echo '<td style="vertical-align:top;">' . (htmlspecialchars($row->trans_patient_phone) ?: '-') . '</td>';
-            echo '<td style="vertical-align:top;">' . (htmlspecialchars($row->doct_name) ?: '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . (htmlspecialchars((string) $row->trans_patient_company) ?: '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . (htmlspecialchars((string) $row->trans_patient_phone) ?: '-') . '</td>';
+            echo '<td style="vertical-align:top;">' . (htmlspecialchars((string) $row->doct_name) ?: '-') . '</td>';
             echo '<td style="vertical-align:top;">' . $cell . '</td>';
             echo '</tr>';
         }

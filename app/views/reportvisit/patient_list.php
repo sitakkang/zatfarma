@@ -33,19 +33,19 @@
                 <?php $no=1; foreach ($rows as $r): ?>
                 <tr>
                     <td style="vertical-align:top;"><?= $no++ ?></td>
-                    <td style="vertical-align:top;"><?= htmlspecialchars($r->trans_patient_code) ?></td>
-                    <td style="vertical-align:top;"><?= htmlspecialchars($r->patient_name) ?></td>
+                    <td style="vertical-align:top;"><?= htmlspecialchars((string) $r->trans_patient_code) ?></td>
+                    <td style="vertical-align:top;"><?= htmlspecialchars((string) $r->patient_name) ?></td>
                     <td style="vertical-align:top;"><?= $r->patient_gender === 'L' ? 'Laki-laki' : ($r->patient_gender === 'P' ? 'Perempuan' : '-') ?></td>
-                    <td style="vertical-align:top;"><?= $r->umur !== '' ? htmlspecialchars($r->umur) . ' Thn' : '-' ?></td>
-                    <td style="vertical-align:top;"><?= htmlspecialchars($r->trans_patient_company) ?: '-' ?></td>
-                    <td style="vertical-align:top;"><?= htmlspecialchars($r->trans_patient_phone) ?: '-' ?></td>
-                    <td style="vertical-align:top;"><?= htmlspecialchars($r->doct_name) ?: '-' ?></td>
+                    <td style="vertical-align:top;"><?= $r->umur !== '' ? htmlspecialchars((string) $r->umur) . ' Thn' : '-' ?></td>
+                    <td style="vertical-align:top;"><?= htmlspecialchars((string) $r->trans_patient_company) ?: '-' ?></td>
+                    <td style="vertical-align:top;"><?= htmlspecialchars((string) $r->trans_patient_phone) ?: '-' ?></td>
+                    <td style="vertical-align:top;"><?= htmlspecialchars((string) $r->doct_name) ?: '-' ?></td>
                     <td style="vertical-align:top;">
                         <?php if (!empty($r->diagnosa_list)): ?>
                             <?php foreach ($r->diagnosa_list as $dgn): ?>
                             <div style="display:flex;align-items:flex-start;gap:4px;margin-bottom:2px;">
                                 <i class="fa fa-caret-right" style="color:var(--ds-primary, #2d6a4f);margin-top:3px;flex:none;"></i>
-                                <span><?= htmlspecialchars($dgn) ?></span>
+                                <span><?= htmlspecialchars((string) $dgn) ?></span>
                             </div>
                             <?php endforeach; ?>
                         <?php else: ?>
