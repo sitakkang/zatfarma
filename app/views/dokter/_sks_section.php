@@ -11,7 +11,7 @@ $defaultDocnumb = '000/SKS/ZAF/' . $bulanRomawi[(int) date('n')] . '/' . date('Y
     <i class="fa fa-info-circle"></i>
     Data diri pasien akan diambil secara otomatis dari data pendaftaran.
     <?php if ($sks): ?>
-        <br><strong>SKS sudah ada:</strong> No. <?= htmlspecialchars($sks->docnumb) ?>
+        <br><strong>SKS sudah ada:</strong> No. <?= htmlspecialchars($sks->docnumb ?? '') ?>
     <?php endif; ?>
 </p>
 
@@ -20,7 +20,7 @@ $defaultDocnumb = '000/SKS/ZAF/' . $bulanRomawi[(int) date('n')] . '/' . date('Y
         <div class="ds-form-group">
             <label>Nomor SKS <span class="text-danger">*</span></label>
             <input type="text" id="sks_docnumb" class="form-control"
-                   value="<?= htmlspecialchars($sks ? $sks->docnumb : $defaultDocnumb, ENT_QUOTES, 'UTF-8') ?>"
+                   value="<?= htmlspecialchars($sks ? ($sks->docnumb ?? '') : $defaultDocnumb, ENT_QUOTES, 'UTF-8') ?>"
                    placeholder="<?= htmlspecialchars($defaultDocnumb, ENT_QUOTES, 'UTF-8') ?>" maxlength="100" autocomplete="off">
         </div>
     </div>
@@ -34,7 +34,7 @@ $defaultDocnumb = '000/SKS/ZAF/' . $bulanRomawi[(int) date('n')] . '/' . date('Y
     <div class="col-md-8" style="padding: 0 6px;">
         <div class="ds-form-group">
             <label>Diagnosa / Keterangan <span class="text-danger">*</span></label>
-            <textarea id="sks_diagnosa" class="form-control" rows="2" placeholder="Diagnosa"><?= htmlspecialchars($sks ? $sks->diagnosa : $sks_diagnosa_default) ?></textarea>
+            <textarea id="sks_diagnosa" class="form-control" rows="2" placeholder="Diagnosa"><?= htmlspecialchars($sks ? ($sks->diagnosa ?? '') : $sks_diagnosa_default) ?></textarea>
         </div>
     </div>
 </div>
@@ -43,7 +43,7 @@ $defaultDocnumb = '000/SKS/ZAF/' . $bulanRomawi[(int) date('n')] . '/' . date('Y
     <div class="col-md-9" style="padding: 0 6px;">
         <div class="ds-form-group">
             <label>Obat / Terapi</label>
-            <textarea id="sks_terapi" class="form-control" rows="2" placeholder="Obat dan dosis"><?= htmlspecialchars($sks ? $sks->terapi : $sks_terapi_default) ?></textarea>
+            <textarea id="sks_terapi" class="form-control" rows="2" placeholder="Obat dan dosis"><?= htmlspecialchars($sks ? ($sks->terapi ?? '') : $sks_terapi_default) ?></textarea>
         </div>
     </div>
     <div class="col-md-3" style="padding: 0 6px;">
@@ -96,8 +96,8 @@ $defaultDocnumb = '000/SKS/ZAF/' . $bulanRomawi[(int) date('n')] . '/' . date('Y
         <tbody>
             <?php foreach ($sks_list as $s): ?>
             <tr>
-                <td style="vertical-align: top;"><?= htmlspecialchars($s->docnumb) ?></td>
-                <td style="vertical-align: top;"><?= nl2br($s->diagnosa) ?></td>
+                <td style="vertical-align: top;"><?= htmlspecialchars($s->docnumb ?? '') ?></td>
+                <td style="vertical-align: top;"><?= nl2br($s->diagnosa ?? '') ?></td>
                 <td class="text-center" style="vertical-align: top;"><?= !empty($s->docdate) ? date('d/m/Y', strtotime($s->docdate)) : '-' ?></td>
                 <td class="text-center" style="vertical-align: top;"><?= !empty($s->datefrom) ? date('d/m/Y', strtotime($s->datefrom)) : '-' ?> s/d <?= !empty($s->dateto) ? date('d/m/Y', strtotime($s->dateto)) : '-' ?></td>
                 <td class="text-center" style="vertical-align: top;">

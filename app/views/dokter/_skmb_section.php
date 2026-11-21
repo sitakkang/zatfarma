@@ -23,7 +23,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
     <label>Nama Pengantar <span class="text-danger">*</span></label>
     <input type="text" id="skmb_pengantar" class="form-control"
            placeholder="Nama pengantar" maxlength="200" autocomplete="off"
-           value="<?= $skmb ? htmlspecialchars($skmb->pengantar) : '' ?>">
+           value="<?= $skmb ? htmlspecialchars($skmb->pengantar ?? '') : '' ?>">
 </div>
 
 <div class="row" style="margin: 0 -6px;">
@@ -32,7 +32,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
             <label>NIK Pengantar</label>
             <input type="text" id="skmb_nik_pengantar" class="form-control"
                    placeholder="NIK pengantar" maxlength="20" autocomplete="off"
-                   value="<?= $skmb ? htmlspecialchars($skmb->nik_pengantar) : '' ?>">
+                   value="<?= $skmb ? htmlspecialchars($skmb->nik_pengantar ?? '') : '' ?>">
         </div>
     </div>
     <div class="col-md-6" style="padding: 0 6px;">
@@ -40,7 +40,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
             <label>Perusahaan Pengantar</label>
             <input type="text" id="skmb_company_pengantar" class="form-control"
                    placeholder="Perusahaan pengantar" maxlength="20" autocomplete="off"
-                   value="<?= $skmb ? htmlspecialchars($skmb->company_pengantar) : '' ?>">
+                   value="<?= $skmb ? htmlspecialchars($skmb->company_pengantar ?? '') : '' ?>">
         </div>
     </div>
 </div>
@@ -51,7 +51,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
     <label>Nama Diantar <span class="text-danger">*</span></label>
     <input type="text" id="skmb_patient_name" class="form-control"
            placeholder="Nama lengkap yang diantar" maxlength="200" autocomplete="off"
-           value="<?= $skmb ? htmlspecialchars($skmb->patient_name) : htmlspecialchars($row->patient_name) ?>">
+           value="<?= $skmb ? htmlspecialchars($skmb->patient_name ?? '') : htmlspecialchars($row->patient_name ?? '') ?>">
 </div>
 
 <div class="row" style="margin: 0 -6px;">
@@ -60,7 +60,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
             <label>NIK Diantar</label>
             <input type="text" id="skmb_nik" class="form-control"
                    placeholder="Nomor induk karyawan" maxlength="50" autocomplete="off"
-                   value="<?= $skmb ? htmlspecialchars($skmb->nik) : htmlspecialchars($row->patient_nik) ?>">
+                   value="<?= $skmb ? htmlspecialchars($skmb->nik ?? '') : htmlspecialchars($row->patient_nik ?? '') ?>">
         </div>
     </div>
     <div class="col-md-6" style="padding: 0 6px;">
@@ -68,7 +68,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
             <label>Perusahaan Diantar</label>
             <input type="text" id="skmb_company_name" class="form-control"
                    placeholder="Nama perusahaan" maxlength="200" autocomplete="off"
-                   value="<?= $skmb ? htmlspecialchars($skmb->company_name) : htmlspecialchars($row->trans_patient_company) ?>">
+                   value="<?= $skmb ? htmlspecialchars($skmb->company_name ?? '') : htmlspecialchars($row->trans_patient_company ?? '') ?>">
         </div>
     </div>
 </div>
@@ -89,7 +89,7 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
             <label>Jam <span class="text-danger">*</span></label>
             <input type="text" id="skmb_jam" class="form-control clockpicker"
                    placeholder="--:--" autocomplete="off" readonly
-                   value="<?= $skmb ? htmlspecialchars($skmb->jam) : $now_tz->format('H:i') ?>">
+                   value="<?= $skmb ? htmlspecialchars($skmb->jam ?? '') : $now_tz->format('H:i') ?>">
         </div>
     </div>
     <div class="col-md-4" style="padding: 0 6px;">
@@ -136,11 +136,11 @@ $skmbDocnumb = $skmb && !empty($skmb->docnumb) ? $skmb->docnumb : $default_skmb_
         </thead>
         <tbody>
             <tr>
-                <td><?= htmlspecialchars($skmb->patient_name) ?></td>
-                <td><?= htmlspecialchars($skmb->pengantar) ?></td>
+                <td><?= htmlspecialchars($skmb->patient_name ?? '') ?></td>
+                <td><?= htmlspecialchars($skmb->pengantar ?? '') ?></td>
                 <td><?= !empty($skmb->tgl_datang) ? date('d/m/Y', strtotime($skmb->tgl_datang)) : '-' ?></td>
-                <td><?= htmlspecialchars($skmb->jam) ?: '-' ?></td>
-                <td><?= htmlspecialchars($skmb->docnumb) ?></td>
+                <td><?= htmlspecialchars($skmb->jam ?? '') ?: '-' ?></td>
+                <td><?= htmlspecialchars($skmb->docnumb ?? '') ?></td>
                 <td class="text-center">
                     <a href="<?= site_url('dokter/cetak_skmb/' . $skmb->id) ?>" target="_blank" class="ds-act-btn ds-act-print" title="Cetak SKMB" style="display:inline-flex;padding:3px 8px;">
                         <i class="fa fa-print"></i>
